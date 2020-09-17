@@ -15,7 +15,9 @@ GameObject:
   - component: {fileID: 3273063542259548182}
   - component: {fileID: 3273063542259548185}
   - component: {fileID: 1685416969}
-  m_Layer: 8
+  - component: {fileID: 1723836365}
+  - component: {fileID: 1723836373}
+  m_Layer: 10
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,13 +124,13 @@ MonoBehaviour:
   _skinWidth: 0.02
   platformMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 257
   triggerMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1536
   oneWayPlatformMask:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   slopeLimit: 50
   jumpingThreshold: 0.07
   slopeSpeedMultiplier:
@@ -234,9 +236,36 @@ MonoBehaviour:
   wallJumpHeight: 3.5
   runSpeed: 8
   wallJumpSpeed: 15
-  dodgeSpeed: 12
+  dodgeSpeed: 15
   groundDamping: 10
   inAirDamping: 4
-  dodgeTime: 0.25
-  invTime: 0.2
+  dodgeTime: 0.225
+  invTime: 0.18
+  invTimeDamaged: 0.5
+  knockbackTime: 0.25
   _velocity: {x: 0, y: 0, z: 0}
+--- !u!114 &1723836365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3273063542259548184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b617ca9ba3ad11c40b87fd254775d1ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_startingState: 0
+--- !u!114 &1723836373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3273063542259548184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 499a70f3a73028d4fba88b4fe33d0884, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

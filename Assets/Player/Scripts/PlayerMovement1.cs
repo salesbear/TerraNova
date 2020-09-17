@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using Prime31;
 
-[RequireComponent(typeof(CharacterController2D), typeof(PlayerStateController))]
+[RequireComponent(typeof(CharacterController2D), typeof(PlayerStateController), typeof(PlayerAttributes))]
 public class PlayerMovement1 : MonoBehaviour
 {
     [Header("Vertical Movement")]
@@ -27,13 +27,24 @@ public class PlayerMovement1 : MonoBehaviour
     [SerializeField] float dodgeSpeed = 12f;
     [SerializeField] float groundDamping = 20f; // how fast do we change direction? higher means faster
     [SerializeField] float inAirDamping = 5f;
+
+    [Header("Timers")]
     //this should really be done by animation frames, but idk how to do that really, another thing to learn
-    [Tooltip("how long the player is invincible while dodging")]
+    [Tooltip("how long the player dodges for")]
     [SerializeField] float dodgeTime = 0.25f;
+    [Tooltip("how long the player is invincible while dodging")]
     [SerializeField] float invTime = 0.2f;
+    [Tooltip("how long the player is invincible when damaged")]
+    [SerializeField] float invTimeDamaged = 0.5f;
+    [SerializeField] float knockbackTime = 0.25f;
     float dodgeTimer = 0.0f;
     float invTimer = 0.0f;
+    float knockbackTimer = 0f;
 
+    //the number of frames between each swap of player visibility
+    [Tooltip("The time between player flashing when they get hit")]
+    [SerializeField] private float flashTime = 0.1f;
+    private float flashTimer = 0;
 
     bool leftPressed = false; //used to handle when both left and right are pressed
     bool rightPressed = false;
@@ -42,8 +53,10 @@ public class PlayerMovement1 : MonoBehaviour
 
     private CharacterController2D _controller;
     private PlayerStateController m_stateController;
+    private PlayerAttributes m_player;
 
     private Animator _animator;
+    private SpriteRenderer m_spriteRenderer;
     private RaycastHit2D _lastControllerColliderHit;
     [ReadOnly]
     [SerializeField]
@@ -51,18 +64,19 @@ public class PlayerMovement1 : MonoBehaviour
 
     float normalizedHorizontalSpeed = 0;
 
-    public event Action<bool> Dodge;
+    //public event Action<bool> Dodge;
 
     void Awake()
     {
         _controller = GetComponent<CharacterController2D>();
-
+        m_player = GetComponent<PlayerAttributes>();
         //TODO: create and add event listeners
         // listen to some events for illustration purposes
         _controller.onControllerCollidedEvent += onControllerCollider;
         _controller.onTriggerEnterEvent += onTriggerEnterEvent;
         _controller.onTriggerExitEvent += onTriggerExitEvent;
         m_stateController = GetComponent<PlayerStateController>();
+        m_spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     #region Event Listeners
@@ -80,105 +94,94 @@ public class PlayerMovement1 : MonoBehaviour
 
     void onTriggerEnterEvent(Collider2D col)
     {
-        Debug.Log("onTriggerEnterEvent: " + col.gameObject.name);
+        //if the object is in the hazard or enemy layer
+        if (col.gameObject.layer == 9 || col.gameObject.layer == 11)
+        {
+            //DamageVolume temp = col.GetComponent<DamageVolume>();
+            //if (temp != null && !invincible && m_stateController.state != PlayerState.Dead)
+            //{
+            //    TakeKnockback(temp.knockbackVector);
+            //    m_player.TakeDamage(temp.damage);
+            //}
+        }
+        //Debug.Log("onTriggerEnterEvent: " + col.gameObject.name);
     }
 
 
     void onTriggerExitEvent(Collider2D col)
     {
-        Debug.Log("onTriggerExitEvent: " + col.gameObject.name);
+        //Debug.Log("onTriggerExitEvent: " + col.gameObject.name);
     }
 
     #endregion
     // Update is called once per frame
     void Update()
     {
-        if (_controller.isGrounded)
+        //if we're dead, don't keep sliding on the floor
+        if (_controller.isGrounded && (int)m_stateController.state == 9)
         {
-            _velocity.y = 0;
+            _velocity.x = 0;
+        }
+        if (knockbackTimer > 0)
+        {
+            knockbackTimer -= Time.deltaTime;
+            if (knockbackTimer < 0 && m_stateController.state != PlayerState.Dead)
+            {
+                if (_controller.isGrounded)
+                {
+                    m_stateController.ChangeState(0);
+                }
+                else
+                {
+                    m_stateController.ChangeState(PlayerState.Fall);
+                }
+            }
         }
         if (dodgeTimer > 0)
         {
             dodgeTimer -= Time.deltaTime;
-            invTimer -= Time.deltaTime;
             if (dodgeTimer <= 0)
             {
                 m_stateController.ChangeState(0);
             }
         }
+        if (invTimer > 0)
+        {
+            invTimer -= Time.deltaTime;
+            if (m_stateController.state != PlayerState.Dead && m_stateController.state != PlayerState.Dodge)
+            {
+                if (flashTimer <= 0)
+                {
+                    if (m_spriteRenderer.enabled)
+                    {
+                        m_spriteRenderer.enabled = false;
+                    }
+                    else
+                    {
+                        m_spriteRenderer.enabled = true;
+                    }
+                    flashTimer = flashTime;
+                }
+                else
+                {
+                    flashTimer -= Time.deltaTime;
+                }
+            }
+            
+            if (invTimer <= 0)
+            {
+                m_spriteRenderer.enabled = true;
+            }
+        }
         //figure out if left or right are being pressed so we can handle the case where both are pressed
-        if (Input.GetButtonDown("Left"))
-        {
-            leftPressed = true;
-        }
-        else if (Input.GetButtonUp("Left"))
-        {
-            leftPressed = false;
-        }
-        if (Input.GetButtonDown("Right"))
-        {
-            rightPressed = true;
-        }
-        else if (Input.GetButtonUp("Right"))
-        {
-            rightPressed = false;
-        }
+        GetHorizontalInput();
+
         //check what buttons have been pressed and set speed based on that
         //TODO: add in animations for running, jumping, etc.
         //if we're in a state where we can move normally
         if ((int)m_stateController.state <= 4)
         {
-            if (leftPressed)
-            {
-                if (rightPressed)
-                {
-                    normalizedHorizontalSpeed = 0;
-                    if (_controller.isGrounded)
-                    {
-                        //set state to idle
-                        m_stateController.ChangeState(0);
-                    }
-                }
-                else
-                {
-                    //make player face left
-                    if (transform.localScale.x > 0f)
-                    {
-                        transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-                    }
-                    normalizedHorizontalSpeed = -1f;
-
-                    if (_controller.isGrounded)
-                    {
-                        //set state to run
-                        m_stateController.ChangeState(1);
-                    }
-                }
-            }
-            else if (rightPressed)
-            {
-                //make player face right
-                if (transform.localScale.x < 0f)
-                {
-                    transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-                }
-                normalizedHorizontalSpeed = 1f;
-
-                if (_controller.isGrounded)
-                {
-                    //set state to run
-                    m_stateController.ChangeState(1);
-                }
-            }
-            else
-            {
-                normalizedHorizontalSpeed = 0f;
-                //set state to idle
-                if (_controller.isGrounded)
-                {
-                    m_stateController.ChangeState(0);
-                }
-            }
+            HandleFacingAndHSpeed();
         }
         //if we can dodge, and the player is trying to
         if (Input.GetButtonDown("Dodge") && (int)m_stateController.state < 7)
@@ -216,10 +219,15 @@ public class PlayerMovement1 : MonoBehaviour
             }
         }
 
-        // apply horizontal speed smoothing. TODO: learn how to use SmoothDamp and change from lerp to SmoothDamp
-        var smoothedMovementFactor = _controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
-        float hSpeed = (m_stateController.state == PlayerState.Dodge && _controller.isGrounded) ? dodgeSpeed : runSpeed; //are we dodging or running?
-        _velocity.x = Mathf.Lerp(_velocity.x, normalizedHorizontalSpeed * hSpeed, Time.deltaTime * smoothedMovementFactor);
+        //if we're not in knockback or dead, update horizontal speed
+        if ((int)m_stateController.state < 8)
+        {
+            // apply horizontal speed smoothing. TODO: learn how to use SmoothDamp and change from lerp to SmoothDamp
+            var smoothedMovementFactor = _controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
+            float hSpeed = (m_stateController.state == PlayerState.Dodge && _controller.isGrounded) ? dodgeSpeed : runSpeed; //are we dodging or running?
+            _velocity.x = Mathf.Lerp(_velocity.x, normalizedHorizontalSpeed * hSpeed, Time.deltaTime * smoothedMovementFactor);
+        }
+        
         
         //TODO: add in a check for if we're wall jumping, wall jumping feels floaty rn
         //if they aren't grounded and we're going up slowly, slow down gravity to give the player a moment to adjust their jump
@@ -259,5 +267,108 @@ public class PlayerMovement1 : MonoBehaviour
 
         // grab our current _velocity to use as a base for all calculations
         _velocity = _controller.velocity;
+    }
+
+    void GetHorizontalInput()
+    {
+        if (Input.GetButtonDown("Left"))
+        {
+            leftPressed = true;
+        }
+        else if (Input.GetButtonUp("Left"))
+        {
+            leftPressed = false;
+        }
+        if (Input.GetButtonDown("Right"))
+        {
+            rightPressed = true;
+        }
+        else if (Input.GetButtonUp("Right"))
+        {
+            rightPressed = false;
+        }
+    }
+
+    /// <summary>
+    /// handles changing state, playing animations, and changing horizontal speed for the player
+    /// </summary>
+    void HandleFacingAndHSpeed()
+    {
+        if (leftPressed)
+        {
+            if (rightPressed)
+            {
+                normalizedHorizontalSpeed = 0;
+                if (_controller.isGrounded)
+                {
+                    //set state to idle
+                    m_stateController.ChangeState(0);
+                }
+            }
+            else
+            {
+                //make player face left
+                if (transform.localScale.x > 0f)
+                {
+                    transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+                }
+                normalizedHorizontalSpeed = -1f;
+
+                if (_controller.isGrounded)
+                {
+                    //set state to run
+                    m_stateController.ChangeState(1);
+                }
+            }
+        }
+        else if (rightPressed)
+        {
+            //make player face right
+            if (transform.localScale.x < 0f)
+            {
+                transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            }
+            normalizedHorizontalSpeed = 1f;
+
+            if (_controller.isGrounded)
+            {
+                //set state to run
+                m_stateController.ChangeState(1);
+            }
+        }
+        else
+        {
+            normalizedHorizontalSpeed = 0f;
+            //set state to idle
+            if (_controller.isGrounded)
+            {
+                m_stateController.ChangeState(0);
+            }
+        }
+    }
+
+    /// <summary>
+    /// take damage and then get knocked back if not dead
+    /// </summary>
+    /// <param name="amount">amount of damage to take</param>
+    /// <param name="knockbackVel"></param>
+    public void TakeDamage(int amount, Vector3 knockbackVel)
+    {
+        if (!invincible)
+        {
+            m_player.TakeDamage(amount);
+            if (m_stateController.state != PlayerState.Dead)
+            {
+                _velocity = knockbackVel;
+                knockbackTimer = knockbackTime;
+                invTimer = invTimeDamaged;
+                m_stateController.ChangeState(8);
+            }
+        }
+    }
+
+    void HandleInvincibility()
+    {
+
     }
 }

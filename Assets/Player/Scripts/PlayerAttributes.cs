@@ -24,7 +24,11 @@ public class PlayerAttributes : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //TODO: Change this to open up a menu, also probably put this somewhere else
+            Application.Quit();
+        }
     }
 
     /// <summary>

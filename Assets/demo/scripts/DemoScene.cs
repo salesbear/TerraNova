@@ -20,12 +20,14 @@ public class DemoScene : MonoBehaviour
 	private Animator _animator;
 	private RaycastHit2D _lastControllerColliderHit;
 	private Vector3 _velocity;
+    //private SpriteRenderer m_spriteRenderer;
 
 
 	void Awake()
 	{
 		_animator = GetComponent<Animator>();
 		_controller = GetComponent<CharacterController2D>();
+        //m_spriteRenderer = GetComponent<SpriteRenderer>();
 
 		// listen to some events for illustration purposes
 		_controller.onControllerCollidedEvent += onControllerCollider;
@@ -64,6 +66,7 @@ public class DemoScene : MonoBehaviour
 	// the Update loop contains a very simple example of moving the character around and controlling the animation
 	void Update()
 	{
+        //Flash();
 		if( _controller.isGrounded )
 			_velocity.y = 0;
 
@@ -122,5 +125,18 @@ public class DemoScene : MonoBehaviour
 		// grab our current _velocity to use as a base for all calculations
 		_velocity = _controller.velocity;
 	}
-
+    ///// <summary>
+    ///// enables and disables the sprite renderer to create a flashing effect
+    ///// </summary>
+    //void Flash()
+    //{
+    //    if (m_spriteRenderer.enabled)
+    //    {
+    //        m_spriteRenderer.enabled = false;
+    //    }
+    //    else
+    //    {
+    //        m_spriteRenderer.enabled = true;
+    //    }
+    //}
 }

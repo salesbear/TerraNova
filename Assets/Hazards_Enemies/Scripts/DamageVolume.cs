@@ -10,9 +10,10 @@ public class DamageVolume : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == 10)
+        //Debug.Log("Object Detected");
+        if (collision.gameObject.layer == 10 && !collision.CompareTag("Hitbox"))
         {
-            PlayerMovement1 player = collision.gameObject.GetComponent<PlayerMovement1>();
+            PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
             player.TakeDamage(damage, knockbackVector);
         }
     }

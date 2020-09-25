@@ -14,7 +14,7 @@ public class SmoothFollow : MonoBehaviour
 	
 	private CharacterController2D _playerController;
 	private Vector3 _smoothDampVelocity;
-	
+    private bool prevRight;
 	
 	void Awake()
 	{
@@ -48,13 +48,29 @@ public class SmoothFollow : MonoBehaviour
 		if( _playerController.velocity.x > 0 )
 		{
 			transform.position = Vector3.SmoothDamp( transform.position, target.position - cameraOffset, ref _smoothDampVelocity, smoothDampTime );
+            prevRight = true;
 		}
-		else
+		else if (_playerController.velocity.x < 0)
 		{
 			var leftOffset = cameraOffset;
 			leftOffset.x *= -1;
 			transform.position = Vector3.SmoothDamp( transform.position, target.position - leftOffset, ref _smoothDampVelocity, smoothDampTime );
+            prevRight = false;
 		}
+        //handle when velocity is set to 0 immediately (i.e. when attacking or something)
+        else
+        {
+            if (prevRight)
+            {
+                transform.position = Vector3.SmoothDamp(transform.position, target.position - cameraOffset, ref _smoothDampVelocity, smoothDampTime);
+            }
+            else
+            {
+                var leftOffset = cameraOffset;
+                leftOffset.x *= -1;
+                transform.position = Vector3.SmoothDamp(transform.position, target.position - leftOffset, ref _smoothDampVelocity, smoothDampTime);
+            }
+        }
 	}
 	
 }

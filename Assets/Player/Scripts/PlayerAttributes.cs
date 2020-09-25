@@ -72,8 +72,8 @@ public class PlayerAttributes : MonoBehaviour
 
     public void Die()
     {
-        // TODO: play death animation
+        // TODO: play death animation (in animation controller script)
         ps_controller.ChangeState(PlayerState.Dead);
-        // TODO: put up UI telling player how to restart from last checkpoint
+        // TODO: put up UI telling player how to restart
     }
 }

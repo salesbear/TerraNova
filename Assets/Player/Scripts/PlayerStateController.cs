@@ -9,7 +9,7 @@ public class PlayerStateController : MonoBehaviour
     public static event Action<PlayerState> StateChanged = delegate { };
     //the state that the player starts at when they spawn
     [SerializeField] PlayerState m_startingState;
-    PlayerState previousState;
+    public PlayerState previousState { get; private set; }
     // Start is called before the first frame update
     void Start()
     {

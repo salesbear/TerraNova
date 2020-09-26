@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - Hitbox
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Hazards
   - Player
   - Enemies
-  - 
+  - Door
   - 
   - 
   - 

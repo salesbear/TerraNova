@@ -5,7 +5,8 @@ using System;
 
 public class PlayerStateController : MonoBehaviour
 {
-    public PlayerState state { get; private set; }
+    [ReadOnly]
+    public PlayerState state;
     public static event Action<PlayerState> StateChanged = delegate { };
     //the state that the player starts at when they spawn
     [SerializeField] PlayerState m_startingState;

@@ -5,8 +5,6 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
     PlayerStateController _stateController;
-    [Tooltip("Has the player unlocked fire shot yet?")]
-    [SerializeField] bool fireUnlocked;
 
     [Tooltip("The hitboxes used for a ground attack")]
     [SerializeField] GameObject[] groundHBoxes;

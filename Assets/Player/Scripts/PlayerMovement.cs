@@ -56,8 +56,10 @@ public class PlayerMovement : MonoBehaviour
     private bool leftPressed = false; //bools used to handle when both left and right are pressed
     private bool rightPressed = false;
     private bool canMoveHoriz = true; //flag for when the script should process horizontal movement
+    public bool facingRight { get { return transform.localScale.x > 0f; } }
 
     private bool canJump { get { return (int)_stateController.state < 6; } }
+    private bool aiming { get { return _stateController.state == PlayerState.Aim; } }
     public bool grounded { get { return _controller.isGrounded; } }
     public bool invincible { get { return invTimer > 0; } }
 
@@ -135,17 +137,13 @@ public class PlayerMovement : MonoBehaviour
     void OnPlayerStateChanged(PlayerState newstate)
     {
         //if newstate is one in which we cannot move horizontally, mark that
-        if ((int)newstate >= 8 || newstate == PlayerState.Aim || newstate == PlayerState.Attack)
+        if ((int)newstate >= 8)
         {
             canMoveHoriz = false;
         }
         else
         {
             canMoveHoriz = true;
-        }
-        if (newstate == PlayerState.Attack || newstate == PlayerState.Aim)
-        {
-            _velocity.x = 0;
         }
     }
 
@@ -168,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
         //check what buttons have been pressed and set speed based on that
         //TODO: add in animations for running, jumping, etc.
         //if we're in a state where we can move normally
-        if ((int)_stateController.state <= 4)
+        if ((int)_stateController.state <= 5)
         {
             HandleFacingAndHSpeed();
         }
@@ -188,6 +186,8 @@ public class PlayerMovement : MonoBehaviour
             // apply horizontal speed smoothing. TODO: learn how to use SmoothDamp and change from lerp to SmoothDamp
             var smoothedMovementFactor = _controller.isGrounded ? groundDamping : inAirDamping; // how fast do we change direction?
             float hSpeed = (_stateController.state == PlayerState.Dodge && _controller.isGrounded) ? dodgeSpeed : runSpeed; //are we dodging or running?
+            //if we're aiming or attacking, set speed to 0
+            hSpeed = (_stateController.state == PlayerState.Aim || _stateController.state == PlayerState.Attack) ? 0 : hSpeed;
             _velocity.x = Mathf.Lerp(_velocity.x, normalizedHorizontalSpeed * hSpeed, Time.deltaTime * smoothedMovementFactor);
         }
 
@@ -303,7 +303,7 @@ public class PlayerMovement : MonoBehaviour
             if (rightPressed)
             {
                 normalizedHorizontalSpeed = 0;
-                if (_controller.isGrounded)
+                if (_controller.isGrounded && !aiming)
                 {
                     //set state to idle
                     _stateController.ChangeState(0);
@@ -312,13 +312,13 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 //make player face left
-                if (transform.localScale.x > 0f)
+                if (facingRight)
                 {
                     transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
                 }
                 normalizedHorizontalSpeed = -1f;
 
-                if (_controller.isGrounded)
+                if (_controller.isGrounded && !aiming)
                 {
                     //set state to run
                     _stateController.ChangeState(1);
@@ -328,13 +328,13 @@ public class PlayerMovement : MonoBehaviour
         else if (rightPressed)
         {
             //make player face right
-            if (transform.localScale.x < 0f)
+            if (!facingRight)
             {
                 transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
             }
             normalizedHorizontalSpeed = 1f;
 
-            if (_controller.isGrounded)
+            if (_controller.isGrounded && !aiming)
             {
                 //set state to run
                 _stateController.ChangeState(1);
@@ -344,7 +344,7 @@ public class PlayerMovement : MonoBehaviour
         {
             normalizedHorizontalSpeed = 0f;
             //set state to idle
-            if (_controller.isGrounded)
+            if (_controller.isGrounded && !aiming)
             {
                 _stateController.ChangeState(0);
             }

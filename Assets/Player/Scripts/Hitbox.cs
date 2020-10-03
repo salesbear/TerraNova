@@ -17,7 +17,7 @@ public class Hitbox : MonoBehaviour
         {
             //Debug.Log("Enemy Hit: " + collision.gameObject.name);
             hit_enemy = true;
-            EnemyStats enemy = collision.gameObject.GetComponent<EnemyStats>();
+            EnemyStats enemy = collision.gameObject.GetComponentInParent<EnemyStats>();
             if (enemy != null)
             {
                 enemy.LogDamage(damage, knockback);

@@ -38,7 +38,7 @@ public class PlayerFire : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (fireUnlocked && (int)_stateController.state <= 2 && Input.GetButtonDown("Fire1"))
+        if (fireUnlocked && (int)_stateController.state <= 1 && Input.GetButtonDown("Fire1"))
         {
             StartAiming();
             //Debug.Log("Aiming Start!");

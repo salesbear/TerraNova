@@ -23,6 +23,21 @@ public class Hitbox : MonoBehaviour
                 enemy.LogDamage(damage, knockback);
             }
         }
+
+        else if (collision.gameObject.layer == 12)
+        {
+            //Debug.Log("Door Detected");
+            Door door = collision.gameObject.GetComponentInParent<Door>();
+            if (door != null)
+            {
+                //Debug.Log("Opening Door");
+                door.Open(false);
+            }
+            //else
+            //{
+            //    //Debug.Log("Door is null");
+            //}
+        }
     }
 
     private void OnDisable()

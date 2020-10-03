@@ -40,6 +40,14 @@ public class Fireball : MonoBehaviour
                 enemy.LogDamage(damage, knockback);
             }
         }
+        if (collision.gameObject.layer == 12)
+        {
+            Door door = collision.gameObject.GetComponentInParent<Door>();
+            if (door != null)
+            {
+                door.Open(true);
+            }
+        }
         Kill();
     }
 

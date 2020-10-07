@@ -11,8 +11,6 @@ public class Fireball : MonoBehaviour
     [SerializeField] float timeToDespawn = 2f;
 
     Rigidbody2D m_rigidbody;
-    bool hit_enemy = false;
-    //[SerializeField] bool sweetSpot; //do more damage if you hit with the head of the hammer
 
     private void Awake()
     {
@@ -48,7 +46,10 @@ public class Fireball : MonoBehaviour
                 door.Open(true);
             }
         }
-        Kill();
+        if (!gameObject.CompareTag("Torch"))
+        {
+            Kill();
+        }
     }
 
     void Kill()

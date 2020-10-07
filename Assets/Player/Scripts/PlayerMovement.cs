@@ -399,6 +399,11 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     void HandleGravity()
     {
+        ////state changes are being weird, so just putting a failsafe here
+        //if (_velocity.y > 0 && _stateController.state == PlayerState.WallSlide && !(_controller.collisionState.left || _controller.collisionState.right))
+        //{
+        //    _stateController.ChangeState(PlayerState.Jump);
+        //}
         //if they aren't grounded and we're going up slowly, slow down gravity to give the player a moment to adjust their jump
         if (_velocity.y < vel_peak && _stateController.state == PlayerState.Jump)
         {
@@ -412,7 +417,7 @@ public class PlayerMovement : MonoBehaviour
             if (canWalljump && (_controller.collisionState.right || _controller.collisionState.left) && (int)_stateController.state < 5)
             {
                 max = wallSlideMaxSpeed;
-                if (!_controller.isGrounded)
+                if (!_controller.isGrounded && _velocity.y < 0)
                 {
                     _stateController.ChangeState(4); //change state to wall sliding
                 }
@@ -427,10 +432,11 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         //if we're falling, set state to falling
-        if (_velocity.y < 0 && !_controller.isGrounded && (int)_stateController.state < 6)
+        if (_velocity.y < 0 && !_controller.isGrounded && (int)_stateController.state < 6 && _stateController.state != PlayerState.WallSlide)
         {
             _stateController.ChangeState(PlayerState.Fall);
         }
+        
     }
 
     /// <summary>

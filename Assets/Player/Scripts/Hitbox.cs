@@ -7,7 +7,6 @@ public class Hitbox : MonoBehaviour
     [SerializeField] Vector3 knockback;
     [SerializeField] int damage = 2; //the amount of damage you do to enemies
     bool hit_enemy = false;
-    //[SerializeField] bool sweetSpot; //do more damage if you hit with the head of the hammer
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

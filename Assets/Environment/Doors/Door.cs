@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
+    [SerializeField] bool unlocked = true;
     [SerializeField] bool fireRequired = false;
     [SerializeField] bool destroyPermanently = false;
+    [Tooltip("the color that the door is tinted by when hit")]
     [SerializeField] Color hitColor;
+    [Tooltip("The color that the door is tinted by while it's locked")]
+    [SerializeField] Color lockColor;
     [SerializeField] float timeToReenable = 3.0f;
     [SerializeField] BoxCollider2D mainBoxCollider;
     float reenableTimer = 0f;
@@ -24,6 +28,10 @@ public class Door : MonoBehaviour
     void Start()
     {
         initialColor = spriteRenderer.color;
+        if (!unlocked)
+        {
+            spriteRenderer.color = lockColor;
+        }
     }
 
     // Update is called once per frame
@@ -62,15 +70,18 @@ public class Door : MonoBehaviour
     /// </summary>
     public void Open(bool hitWithFire)
     {
-        if (mainBoxCollider.enabled && (hitWithFire || !fireRequired))
+        if (unlocked)
         {
-            if (destroyPermanently)
+            if (mainBoxCollider.enabled && (hitWithFire || !fireRequired))
             {
-                gameObject.SetActive(false);
+                if (destroyPermanently)
+                {
+                    gameObject.SetActive(false);
+                }
+                mainBoxCollider.enabled = false;
+                spriteRenderer.color = hitColor;
+                reenableTimer = timeToReenable;
             }
-            mainBoxCollider.enabled = false;
-            spriteRenderer.color = hitColor;
-            reenableTimer = timeToReenable;
         }
     }
 
@@ -78,5 +89,11 @@ public class Door : MonoBehaviour
     {
         spriteRenderer.color = initialColor;
         mainBoxCollider.enabled = true;
+    }
+
+    public void Unlock()
+    {
+        unlocked = true;
+        spriteRenderer.color = initialColor;
     }
 }

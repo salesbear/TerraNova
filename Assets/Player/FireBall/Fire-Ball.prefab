@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   knockback: {x: 0, y: 0, z: 0}
-  damage: 3
+  damage: 2
   speed: 10
   timeToDespawn: 2
 --- !u!61 &815141781

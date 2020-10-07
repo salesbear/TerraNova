@@ -4,10 +4,21 @@ using UnityEngine;
 
 public class PlayerAttributes : MonoBehaviour
 {
-    public int health { get; private set; }
-    public int maxHealth { get; private set; }
-    public int mana { get; private set; }
-    public int maxMana { get; private set; }
+    [Tooltip("the player's max health points")]
+    [SerializeField] int maxHealth = 6;
+    [ReadOnly]
+    [Tooltip("Your current health")]
+    public int health;
+    [Tooltip("the player's max mana points")]
+    [SerializeField] int maxMana = 10;
+    [ReadOnly]
+    [Tooltip("Your current mana")]
+    [SerializeField] int mana;
+    public bool hasMana { get { return mana > 0; } }
+
+    [Tooltip("Allows you to increase your health, max health, mana, and max mana at will")]
+    [SerializeField] bool debugMode = true;
+    
 
     //PlayerMovement1 player;
     PlayerStateController ps_controller;
@@ -16,14 +27,43 @@ public class PlayerAttributes : MonoBehaviour
     void Start()
     {
         ps_controller = GetComponent<PlayerStateController>();
-        //TODO: Load Max Health instead of setting it.
-        SetMaxHealth(6);
-        health = maxHealth;
+        //TODO: Load Max Health and mana instead of setting it.
+        SetMaxHealth(maxHealth);
+        SetMaxMana(maxMana);
     }
 
     // Update is called once per frame
     void Update()
     {
+        //key codes to allow you to arbitrarily change health and mana in debug mode
+        if (debugMode)
+        {
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                TakeDamage(1);
+            }
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                IncreaseHealth(1);
+            }
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                ReduceMana(1);
+            }
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                IncreaseMana(1);
+            }
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                IncreaseHealth(maxHealth);
+            }
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                IncreaseMana(maxMana);
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             //TODO: Change this to open up a menu, also probably put this somewhere else
@@ -38,6 +78,7 @@ public class PlayerAttributes : MonoBehaviour
     public void SetMaxHealth(int value)
     {
         maxHealth = Mathf.Max(value,1);
+        health = maxHealth;
     }
 
     /// <summary>
@@ -48,6 +89,17 @@ public class PlayerAttributes : MonoBehaviour
         maxHealth += 2;
         health = maxHealth;
     }
+
+    /// <summary>
+    /// increases your health by the amount given, won't increase past max
+    /// </summary>
+    /// <param name="amount"></param>
+    public void IncreaseHealth(int amount)
+    {
+        health = Mathf.Min(health + amount, maxHealth);
+    }
+
+    
     /// <summary>
     /// sets Max Mana to value, or zero if value is negative
     /// </summary>
@@ -58,15 +110,46 @@ public class PlayerAttributes : MonoBehaviour
         mana = maxMana;
     }
 
+    /// <summary>
+    /// reduces mana by amount and returns true 
+    /// if the player has enough mana 
+    /// to make that reduction
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <returns></returns>
+    public bool ReduceMana(int amount)
+    {
+        mana -= amount;
+        if (mana < 0)
+        {
+            mana = 0;
+            return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// increases mana by amount, bounded by maxMana
+    /// </summary>
+    /// <param name="amount"></param>
+    public void IncreaseMana(int amount)
+    {
+        mana = Mathf.Min(mana + amount, maxMana);
+    }
+
+    /// <summary>
+    /// reduces health by amount and kills the player if it's less than or equal to 0
+    /// </summary>
+    /// <param name="amount"></param>
     public void TakeDamage(int amount)
     {
-        Debug.Log("Take Damage Called");
+        //Debug.Log("Take Damage Called");
         health -= amount;
-        Debug.Log("Current Health: " + health);
+        //Debug.Log("Current Health: " + health);
         if (health <= 0)
         {
             Die();
-            Debug.Log("You Dead");
+            //Debug.Log("You Dead");
         }
     }
 

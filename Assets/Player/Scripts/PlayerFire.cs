@@ -10,16 +10,24 @@ public class PlayerFire : MonoBehaviour
     [SerializeField] Transform aimPoint;
     [Tooltip("The renderer that we use to show where the player is aiming")]
     [SerializeField] SpriteRenderer aimSprite;
+    [Tooltip("the cost to shoot")]
+    [SerializeField] int manaCost = 1;
+    [Tooltip("The time in seconds before you can fire again")]
+    [SerializeField] float coolDownTime = 0.2f;
+    float coolDownTimer = 0f;
     [Tooltip("the fireball prefab")]
     [SerializeField] GameObject fireBall;
 
+
     PlayerStateController _stateController;
-    PlayerMovement player;
+    PlayerMovement playerMove;
+    PlayerAttributes player;
 
     private void Awake()
     {
         _stateController = GetComponentInParent<PlayerStateController>();
-        player = GetComponentInParent<PlayerMovement>();
+        playerMove = GetComponentInParent<PlayerMovement>();
+        player = GetComponentInParent<PlayerAttributes>();
         PlayerStateController.StateChanged += OnStateChange;
     }
 
@@ -32,24 +40,39 @@ public class PlayerFire : MonoBehaviour
         else
         {
             aimSprite.enabled = false;
+            transform.rotation = Quaternion.identity;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (fireUnlocked && (int)_stateController.state <= 1 && Input.GetButtonDown("Fire1"))
+        if (coolDownTimer > 0)
         {
-            StartAiming();
-            //Debug.Log("Aiming Start!");
+            coolDownTimer -= Time.deltaTime;
         }
-
-        if (_stateController.state == PlayerState.Aim)
+        else if (fireUnlocked && player.hasMana)
         {
-            Aim();
-            if (Input.GetButtonUp("Fire1"))
+            if (Input.GetButtonDown("Fire1"))
             {
-                Fire();
+                if ((int)_stateController.state <= 1)
+                {
+                    StartAiming();
+                    //Debug.Log("Aiming Start!");
+                }
+                else if ((int)_stateController.state <= 3)
+                {
+                    Fire();
+                }
+            }
+        
+            if (_stateController.state == PlayerState.Aim)
+            {
+                Aim();
+                if (Input.GetButtonUp("Fire1"))
+                {
+                    Fire();
+                }
             }
         }
     }
@@ -85,7 +108,7 @@ public class PlayerFire : MonoBehaviour
             downPressed = true;
         }
 
-        int facingMultiplier = (player.facingRight) ? 1 : -1;
+        int facingMultiplier = (playerMove.facingRight) ? 1 : -1;
         //set angle
         if (downPressed)
         {
@@ -110,13 +133,19 @@ public class PlayerFire : MonoBehaviour
     {
         //Debug.Log("Fire!");
         //Debug.Log("Transform rotation: " + transform.rotation.eulerAngles);
-        Quaternion fireAngle = new Quaternion();
-        int offset = (player.facingRight) ? 0 : 180;
-        fireAngle = Quaternion.Euler(transform.rotation.eulerAngles.x, 
-            transform.rotation.eulerAngles.y, 
-            transform.rotation.eulerAngles.z + offset);
+        bool shotAllowed = player.ReduceMana(manaCost);
+        if (shotAllowed)
+        {
+            Quaternion fireAngle = new Quaternion();
+            int offset = (playerMove.facingRight) ? 0 : 180;
+            fireAngle = Quaternion.Euler(
+                transform.rotation.eulerAngles.x, 
+                transform.rotation.eulerAngles.y, 
+                transform.rotation.eulerAngles.z + offset);
 
-        Instantiate(fireBall, aimPoint.position, fireAngle);
+            Instantiate(fireBall, aimPoint.position, fireAngle);
+            coolDownTimer = coolDownTime;
+        }
         _stateController.ChangeState(0);
     }
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Hitbox
+  - Torch
   layers:
   - Default
   - TransparentFX
@@ -20,8 +21,8 @@ TagManager:
   - Player
   - Enemies
   - Door
-  - 
-  - 
+  - Fireball
+  - Switches
   - 
   - 
   - 

@@ -5,6 +5,7 @@ using System;
 
 public class PlayerAttributes : MonoBehaviour
 {
+    [Header("Health and Mana")]
     [Tooltip("the player's max health points")]
     public int maxHealth = 6;
     [ReadOnly]
@@ -14,6 +15,13 @@ public class PlayerAttributes : MonoBehaviour
     public int maxMana = 10;
     public int mana { get; private set; }
     public bool hasMana { get { return mana > 0; } }
+
+    [Header("Abilities")]
+    [Tooltip("controls if the player can fire a fireball")]
+    public bool fireUnlocked = true;
+    [Tooltip("controls if the player can walljump")]
+    public bool wallJumpUnlocked = true;
+
     [Header("Audio")]
     [Tooltip("The sound that plays when the player regains health")]
     [SerializeField] private AudioClip healSound;
@@ -25,6 +33,7 @@ public class PlayerAttributes : MonoBehaviour
     [SerializeField] private AudioClip deathSound;
     [Tooltip("the range for randomizing the pitch")]
     [SerializeField] private Vector2 pitchRange = new Vector2(-0.1f,0.1f);
+    
     [Header("Debug")]
     [Tooltip("Allows you to increase your health, max health, mana, and max mana at will")]
     [SerializeField] bool debugMode = true;
@@ -118,7 +127,7 @@ public class PlayerAttributes : MonoBehaviour
     public void IncreaseHealth(int amount)
     {
         health = Mathf.Min(health + amount, maxHealth);
-        PlayerAudio.instance.PlaySound(healSound, pitchRange);
+        AudioManager.instance.PlaySound(healSound, pitchRange);
     }
 
     
@@ -157,7 +166,7 @@ public class PlayerAttributes : MonoBehaviour
     public void IncreaseMana(int amount)
     {
         mana = Mathf.Min(mana + amount, maxMana);
-        PlayerAudio.instance.PlaySound(manaRegenSound, pitchRange);
+        AudioManager.instance.PlaySound(manaRegenSound, pitchRange);
     }
 
     /// <summary>
@@ -176,14 +185,14 @@ public class PlayerAttributes : MonoBehaviour
         }
         else if (ps_controller.state != PlayerState.Dead)
         {
-            PlayerAudio.instance.PlaySound(hurtSound, pitchRange);
+            AudioManager.instance.PlaySound(hurtSound, pitchRange);
         }
     }
 
     public void Die()
     {
         // TODO: play death animation (in animation controller script)
-        PlayerAudio.instance.PlaySound(deathSound, pitchRange);
+        AudioManager.instance.PlaySound(deathSound, pitchRange);
         ps_controller.ChangeState(PlayerState.Dead);
         // TODO: put up UI telling player how to restart
     }

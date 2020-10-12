@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerFire : MonoBehaviour
 {
-    [Tooltip("Has the player unlocked fire shot yet?")]
-    public bool fireUnlocked;
     [Header("Controls")]
     [Tooltip("the cost to shoot")]
     [SerializeField] int manaCost = 1;
@@ -33,7 +31,9 @@ public class PlayerFire : MonoBehaviour
     PlayerStateController _stateController;
     PlayerMovement playerMove;
     PlayerAttributes player;
-    bool facingRightInitially;
+    [Header("Debug")]
+    [ReadOnly]
+    [SerializeField] bool facingRightInitially;
 
     private void Awake()
     {
@@ -69,7 +69,7 @@ public class PlayerFire : MonoBehaviour
         {
             coolDownTimer -= Time.deltaTime;
         }
-        else if (fireUnlocked && player.hasMana)
+        else if (player.fireUnlocked && player.hasMana)
         {
             if (Input.GetButtonDown("Fire1"))
             {
@@ -101,6 +101,7 @@ public class PlayerFire : MonoBehaviour
     void StartAiming()
     {
         facingRightInitially = playerMove.facingRight;
+        Debug.Log("StartAiming");
         _stateController.ChangeState(PlayerState.Aim);
     }
 
@@ -180,7 +181,7 @@ public class PlayerFire : MonoBehaviour
                 transform.rotation.eulerAngles.y, 
                 transform.rotation.eulerAngles.z + offset);
 
-            PlayerAudio.instance.PlaySound(shootSound);
+            AudioManager.instance.PlaySound(shootSound);
             Instantiate(fireBall, aimPoint.position, fireAngle);
             coolDownTimer = coolDownTime;
         }

@@ -18,7 +18,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float maxFallSpeed = 15f;
     [Tooltip("Gravity used at the peak of the jump")]
     [SerializeField] float peakGravity = -10f;
-    public bool canWalljump = true;
     [SerializeField] float wallJumpHeight = 3.5f;
     private float vel_peak = 1.5f; //this is the magnitude of vertical velocity that signifies that the character is at the peak of their jump
 
@@ -382,7 +381,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         _stateController.ChangeState(PlayerState.Dodge);
-        PlayerAudio.instance.PlaySound(dodgeSound, pitchRange);
+        AudioManager.instance.PlaySound(dodgeSound, pitchRange);
         m_spriteRenderer.color = dodgeTint;
     }
     
@@ -395,17 +394,17 @@ public class PlayerMovement : MonoBehaviour
         {
             _velocity.y = Mathf.Sqrt(2f * jumpHeight * -gravity);
             _stateController.ChangeState(2); //change state to jump
-            PlayerAudio.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
+            AudioManager.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
         }
 
         //if we can walljump, do it
         //TODO: put in a check for if we're in knockback
-        else if (canWalljump && (_controller.collisionState.right || _controller.collisionState.left))
+        else if (m_player.wallJumpUnlocked && (_controller.collisionState.right || _controller.collisionState.left))
         {
             _velocity.y = Mathf.Sqrt(2f * wallJumpHeight * -gravity);
             _velocity.x = wallJumpSpeed * -normalizedHorizontalSpeed;
             _stateController.ChangeState(2); //change state to jump
-            PlayerAudio.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
+            AudioManager.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
         }
     }
     
@@ -429,7 +428,7 @@ public class PlayerMovement : MonoBehaviour
             _velocity.y += gravity * Time.deltaTime;
             //set max fall speed based on if we're wall sliding or not
             float max = 0;
-            if (canWalljump && (_controller.collisionState.right || _controller.collisionState.left) && (int)_stateController.state < 5)
+            if (m_player.wallJumpUnlocked && (_controller.collisionState.right || _controller.collisionState.left) && (int)_stateController.state < 5)
             {
                 max = wallSlideMaxSpeed;
                 if (!_controller.isGrounded && _velocity.y < 0)

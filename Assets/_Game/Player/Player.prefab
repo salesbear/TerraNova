@@ -126,7 +126,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbfa44595e9664a41a5752ec6b7a7435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireUnlocked: 1
   manaCost: 1
   coolDownTime: 0.15
   offsetScale: {x: 2, y: 2, z: 0}
@@ -134,6 +133,7 @@ MonoBehaviour:
   aimSprite: {fileID: 28338747}
   fireBall: {fileID: 2161404016418761501, guid: a26d6d16d5730e349894025bbd9302e3, type: 3}
   shootSound: {fileID: 8300000, guid: 2d3f91d2da640344399322ab95b134ac, type: 3}
+  facingRightInitially: 0
 --- !u!1 &1185372965277212873
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +188,7 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
@@ -389,7 +389,7 @@ MonoBehaviour:
     m_Bits: 257
   triggerMask:
     serializedVersion: 2
-    m_Bits: 7680
+    m_Bits: 40448
   oneWayPlatformMask:
     serializedVersion: 2
     m_Bits: 0
@@ -494,14 +494,15 @@ MonoBehaviour:
   jumpHeight: 4
   maxFallSpeed: 20
   peakGravity: -12
-  canWalljump: 1
   wallJumpHeight: 3.5
+  dodgeSpeed: 20
+  dodgeTime: 0.233
+  dodgeSize: {x: 0.3869133, y: 0.75}
+  dodgeOffset: {x: 0, y: -0.625}
   runSpeed: 9
   wallJumpSpeed: 14
-  dodgeSpeed: 20
   groundDamping: 10
   inAirDamping: 4
-  dodgeTime: 0.233
   invTime: 0.21
   invTimeDamaged: 1.25
   knockbackTime: 0.25
@@ -541,6 +542,8 @@ MonoBehaviour:
   maxHealth: 6
   health: 0
   maxMana: 6
+  fireUnlocked: 1
+  wallJumpUnlocked: 1
   healSound: {fileID: 8300000, guid: 6c2440afb0162164898bfa5f7c429dba, type: 3}
   manaRegenSound: {fileID: 8300000, guid: 11543e6bf345946498a71ee881935507, type: 3}
   hurtSound: {fileID: 8300000, guid: f2e7ef3d80b6f914881638d0b82c4fbb, type: 3}
@@ -792,7 +795,7 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0

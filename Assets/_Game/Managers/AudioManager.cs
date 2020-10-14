@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAudio : MonoBehaviour
+public class AudioManager : MonoBehaviour
 {
     AudioSource audioSource;
-    public static PlayerAudio instance;
+    public static AudioManager instance;
 
     private void Awake()
     {

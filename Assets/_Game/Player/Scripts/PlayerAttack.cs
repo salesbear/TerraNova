@@ -88,7 +88,7 @@ public class PlayerAttack : MonoBehaviour
             {
                 attackTimer = attackTime;
                 EnableGroundHitBoxes();
-                PlayerAudio.instance.PlaySound(attackSound,attackVolume);
+                AudioManager.instance.PlaySound(attackSound,attackVolume);
             }
         }
     }

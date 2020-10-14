@@ -18,6 +18,9 @@ public class EnemyStats : MonoBehaviour
     [Tooltip("The amount of time before they can be damaged again")]
     [SerializeField] float invincibilityTime = 0.15f;
     [SerializeField] AudioClip hurtClip;
+    [Tooltip("The percent chance that the enemy drops something on death")]
+    [Range(0,100)]
+    [SerializeField] int dropChance = 30;
     AudioSource audioSource;
     float invincibilityTimer = 0f;
 
@@ -75,6 +78,12 @@ public class EnemyStats : MonoBehaviour
     //TODO: implement death animation, drop system
     void Die()
     {
+        GameObject drop = DropManager.instance.Drop(dropChance);
+        //if there's a drop, drop it
+        if (drop != null)
+        {
+            Instantiate(drop, transform.position, transform.rotation);
+        }
         gameObject.SetActive(false);
     }
 

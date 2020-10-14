@@ -18,23 +18,34 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float maxFallSpeed = 15f;
     [Tooltip("Gravity used at the peak of the jump")]
     [SerializeField] float peakGravity = -10f;
-    public bool canWalljump = true;
     [SerializeField] float wallJumpHeight = 3.5f;
     private float vel_peak = 1.5f; //this is the magnitude of vertical velocity that signifies that the character is at the peak of their jump
+    [Space]
+    [Header("Dodge Stuff")]
+    [SerializeField] float dodgeSpeed = 12f;
+    [Tooltip("how long the player dodges for")]
+    [SerializeField] float dodgeTime = 0.25f;
+    [Tooltip("The size of the player's box collider while dodging")]
+    [SerializeField] Vector2 dodgeSize;
+    [Tooltip("The offset for the player's box collider while dodging")]
+    [SerializeField] Vector2 dodgeOffset;
+    BoxCollider2D m_playerCollision;
+    //the offset of the BoxCollider2D on the player normally
+    Vector2 startOffset;
+    //the size of the BoxCollider2D on the player normally
+    Vector2 startSize;
+    
 
     [Space]
     [Header("Horizontal Movement")]
     [SerializeField] float runSpeed = 8f;
     [SerializeField] float wallJumpSpeed = 12f;
-    [SerializeField] float dodgeSpeed = 12f;
     [SerializeField] float groundDamping = 20f; // how fast do we change direction? higher means faster
     [SerializeField] float inAirDamping = 5f;
 
     [Space]
     [Header("Timers")]
     //this should really be done by animation frames, but idk how to do that really, another thing to learn
-    [Tooltip("how long the player dodges for")]
-    [SerializeField] float dodgeTime = 0.25f;
     [Tooltip("how long the player is invincible while dodging")]
     [SerializeField] float invTime = 0.2f;
     [Tooltip("how long the player is invincible when damaged")]
@@ -77,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController2D _controller;
     private PlayerStateController _stateController;
-    private PlayerAttributes m_player;
+    private PlayerAttributes _player;
 
     private Animator _animator;
     private SpriteRenderer m_spriteRenderer;
@@ -97,9 +108,10 @@ public class PlayerMovement : MonoBehaviour
     {
         //getcomponent stuff
         _controller = GetComponent<CharacterController2D>();
-        m_player = GetComponent<PlayerAttributes>();
+        _player = GetComponent<PlayerAttributes>();
         _stateController = GetComponent<PlayerStateController>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_playerCollision = GetComponent<BoxCollider2D>();
         // listen to some events
         //_controller.onControllerCollidedEvent += onControllerCollider;
         //_controller.onTriggerEnterEvent += onTriggerEnterEvent;
@@ -110,6 +122,8 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         m_initialColor = m_spriteRenderer.color;
+        startSize = m_playerCollision.size;
+        startOffset = m_playerCollision.offset;
     }
     #region Event Listeners
 
@@ -147,6 +161,18 @@ public class PlayerMovement : MonoBehaviour
 
     void OnPlayerStateChanged(PlayerState newstate)
     {
+        if (newstate == PlayerState.Dodge)
+        {
+            m_playerCollision.size = dodgeSize;
+            m_playerCollision.offset = dodgeOffset;
+            _controller.recalculateDistanceBetweenRays();
+        }
+        else if (_stateController.previousState == PlayerState.Dodge)
+        {
+            m_playerCollision.offset = startOffset;
+            m_playerCollision.size = startSize;
+            _controller.recalculateDistanceBetweenRays();
+        }
         //if newstate is one in which we cannot move horizontally, mark that
         if ((int)newstate >= 8)
         {
@@ -253,7 +279,16 @@ public class PlayerMovement : MonoBehaviour
             dodgeTimer -= Time.deltaTime;
             if (dodgeTimer <= 0)
             {
-                _stateController.ChangeState(0);
+                //if we can undodge
+                if (CeilingCheck())
+                {
+                    _stateController.ChangeState(0);
+                }
+                else
+                {
+                    //add a tiny amount to dodge timer so we check if we can undodge next frame
+                    dodgeTimer = 0.01f;
+                }
             }
         }
     }
@@ -382,7 +417,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         _stateController.ChangeState(PlayerState.Dodge);
-        PlayerAudio.instance.PlaySound(dodgeSound, pitchRange);
+        AudioManager.instance.PlaySound(dodgeSound, pitchRange);
         m_spriteRenderer.color = dodgeTint;
     }
     
@@ -395,17 +430,17 @@ public class PlayerMovement : MonoBehaviour
         {
             _velocity.y = Mathf.Sqrt(2f * jumpHeight * -gravity);
             _stateController.ChangeState(2); //change state to jump
-            PlayerAudio.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
+            AudioManager.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
         }
 
         //if we can walljump, do it
         //TODO: put in a check for if we're in knockback
-        else if (canWalljump && (_controller.collisionState.right || _controller.collisionState.left))
+        else if (_player.wallJumpUnlocked && (_controller.collisionState.right || _controller.collisionState.left))
         {
             _velocity.y = Mathf.Sqrt(2f * wallJumpHeight * -gravity);
             _velocity.x = wallJumpSpeed * -normalizedHorizontalSpeed;
             _stateController.ChangeState(2); //change state to jump
-            PlayerAudio.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
+            AudioManager.instance.PlaySound(jumpSound, pitchRange, jumpVolume);
         }
     }
     
@@ -429,7 +464,7 @@ public class PlayerMovement : MonoBehaviour
             _velocity.y += gravity * Time.deltaTime;
             //set max fall speed based on if we're wall sliding or not
             float max = 0;
-            if (canWalljump && (_controller.collisionState.right || _controller.collisionState.left) && (int)_stateController.state < 5)
+            if (_player.wallJumpUnlocked && (_controller.collisionState.right || _controller.collisionState.left) && (int)_stateController.state < 5)
             {
                 max = wallSlideMaxSpeed;
                 if (!_controller.isGrounded && _velocity.y < 0)
@@ -463,7 +498,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!invincible)
         {
-            m_player.TakeDamage(amount);
+            _player.TakeDamage(amount);
             if (_stateController.state != PlayerState.Dead)
             {
                 _velocity = knockbackVel;
@@ -473,4 +508,37 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+    /// <summary>
+    /// checks if we'll bang our head on the ceiling when we stop dodging
+    /// returns false if there's a ceiling in the way of standing up, true otherwise
+    /// </summary>
+    /// <returns></returns>
+    bool CeilingCheck()
+    {
+        float rayDist = (startSize.y - dodgeSize.y) + _controller.skinWidth;
+        Vector3 raycastOrigin;
+        RaycastHit2D raycastHit;
+        //if we're moving right, check from the leftmost point
+        if (_velocity.x > 0)
+        {
+            raycastOrigin = new Vector3(m_playerCollision.bounds.min.x,m_playerCollision.bounds.max.y - _controller.skinWidth,m_playerCollision.bounds.min.z);
+        }
+        //if we're moving left, check from the rightmost point
+        else
+        {
+            raycastOrigin = new Vector3(m_playerCollision.bounds.max.x,m_playerCollision.bounds.max.y - _controller.skinWidth, m_playerCollision.bounds.max.z);
+        }
+        //check if we've hit anything in our platform layer
+        raycastHit = Physics2D.Raycast(raycastOrigin, Vector2.up, rayDist, _controller.platformMask);
+        Debug.DrawRay(raycastOrigin, new Vector3(0, rayDist, 0), Color.green);
+        //if we've hit something, return false to show that we can't stop dodging right now
+        if (raycastHit)
+        {
+            //Debug.Log("It works the way I think it does");
+            return false;
+        }
+        Debug.DrawRay(raycastOrigin, new Vector3(0, rayDist, 0),Color.green); 
+        return true;
+    }
+
 }

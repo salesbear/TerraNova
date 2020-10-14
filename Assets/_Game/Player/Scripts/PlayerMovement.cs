@@ -276,6 +276,7 @@ public class PlayerMovement : MonoBehaviour
         //dodge timer
         if (dodgeTimer > 0)
         {
+            CeilingCheck();
             dodgeTimer -= Time.deltaTime;
             if (dodgeTimer <= 0)
             {
@@ -516,28 +517,27 @@ public class PlayerMovement : MonoBehaviour
     bool CeilingCheck()
     {
         float rayDist = (startSize.y - dodgeSize.y) + _controller.skinWidth;
+        float boundsWidth = m_playerCollision.bounds.max.x - m_playerCollision.bounds.min.x - (_controller.skinWidth * 2);
+        //divide by total rays - 1 so we hit both edges
+        float distBetweenRays = boundsWidth / (_controller.totalVerticalRays - 1);
+        //set the raycast origin to the top left corner
         Vector3 raycastOrigin;
         RaycastHit2D raycastHit;
-        //if we're moving right, check from the leftmost point
-        if (_velocity.x > 0)
+        //check for collision along each ray
+        for (int i = 0; i < _controller.totalVerticalRays; i++)
         {
-            raycastOrigin = new Vector3(m_playerCollision.bounds.min.x,m_playerCollision.bounds.max.y - _controller.skinWidth,m_playerCollision.bounds.min.z);
+            
+            raycastOrigin = new Vector3(m_playerCollision.bounds.min.x + _controller.skinWidth + distBetweenRays * i,
+                m_playerCollision.bounds.max.y - _controller.skinWidth,
+                m_playerCollision.bounds.max.z);
+            raycastHit = Physics2D.Raycast(raycastOrigin, Vector2.up, rayDist, _controller.platformMask);
+            Debug.DrawRay(raycastOrigin, new Vector3(0, rayDist, 0), Color.red);
+            if (raycastHit)
+            {
+                //Debug.Log("It works the way I think it does");
+                return false;
+            }
         }
-        //if we're moving left, check from the rightmost point
-        else
-        {
-            raycastOrigin = new Vector3(m_playerCollision.bounds.max.x,m_playerCollision.bounds.max.y - _controller.skinWidth, m_playerCollision.bounds.max.z);
-        }
-        //check if we've hit anything in our platform layer
-        raycastHit = Physics2D.Raycast(raycastOrigin, Vector2.up, rayDist, _controller.platformMask);
-        Debug.DrawRay(raycastOrigin, new Vector3(0, rayDist, 0), Color.green);
-        //if we've hit something, return false to show that we can't stop dodging right now
-        if (raycastHit)
-        {
-            //Debug.Log("It works the way I think it does");
-            return false;
-        }
-        Debug.DrawRay(raycastOrigin, new Vector3(0, rayDist, 0),Color.green); 
         return true;
     }
 

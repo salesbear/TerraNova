@@ -1265,22 +1265,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: dodgeCooldownTime
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: dodgeCooldownTint.r
-      value: 0.8773585
-      objectReference: {fileID: 0}
-    - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: dodgeCooldownTint.g
-      value: 0.8773585
-      objectReference: {fileID: 0}
-    - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: dodgeCooldownTint.b
-      value: 0.8773585
-      objectReference: {fileID: 0}
     - target: {fileID: 3273063542259548176, guid: 816686e638156bd4687855f21958d5f9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1324,18 +1308,6 @@ PrefabInstance:
     - target: {fileID: 3273063542259548176, guid: 816686e638156bd4687855f21958d5f9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3273063542259548179, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3273063542259548179, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3273063542259548179, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: m_Color.b
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3273063542259548184, guid: 816686e638156bd4687855f21958d5f9, type: 3}
       propertyPath: m_Name
@@ -3122,6 +3094,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 1666091106}
+    - target: {fileID: 3211175290452303592, guid: 1f60529086595514cbab7e3eb17592f9, type: 3}
+      propertyPath: smoothDampTimeAim
+      value: 0.35
+      objectReference: {fileID: 0}
     - target: {fileID: 3211175290452303594, guid: 1f60529086595514cbab7e3eb17592f9, type: 3}
       propertyPath: m_Name
       value: Main Camera

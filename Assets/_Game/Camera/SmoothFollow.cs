@@ -7,6 +7,7 @@ public class SmoothFollow : MonoBehaviour
 {
 	public Transform target;
 	public float smoothDampTime = 0.2f;
+    public float smoothDampTimeAim = 0.5f;
     //public float smoothDampTimeFalling = 0.15f;
     //used to make the camera less jerky when sliding on a wall
     public float smoothDampTimeWallslide = 0.5f;
@@ -72,6 +73,11 @@ public class SmoothFollow : MonoBehaviour
             case 4:
                 cameraOffsetLocal = cameraOffsetWallslide;
                 smoothDampTimeLocal = smoothDampTimeWallslide;
+                break;
+            case 5:
+                //camera offset is changed in aim so that we can look in the same direction as we aiming
+                cameraOffsetLocal = cameraOffset;
+                smoothDampTimeLocal = smoothDampTimeAim;
                 break;
             default:
                 cameraOffsetLocal = cameraOffset;

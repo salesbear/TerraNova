@@ -334,7 +334,10 @@ public class PlayerMovement : MonoBehaviour
         if (dodgeCooldownTimer > 0)
         {
             dodgeCooldownTimer -= Time.deltaTime;
-            if (dodgeCooldownTimer <= 0)
+            //clamp dodge cooldown timer to 0 so we don't get weird stuff in the lerp
+            dodgeCooldownTimer = Mathf.Max(dodgeCooldownTimer, 0);
+            m_spriteRenderer.color = Color.Lerp(m_initialColor, dodgeCooldownTint, dodgeCooldownTimer / dodgeCooldownTime);
+            if (dodgeCooldownTimer == 0)
             {
                 m_spriteRenderer.color = m_initialColor;
             }

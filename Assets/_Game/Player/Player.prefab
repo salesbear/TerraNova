@@ -498,9 +498,10 @@ MonoBehaviour:
   wallJumpHeight: 3.5
   dodgeSpeed: 18
   dodgeTime: 0.25
-  invTimeDodge: 0.22
-  dodgeCooldownTime: 0.15
-  dodgeCooldownTint: {r: 0.70980394, g: 0.70980394, b: 0.70980394, a: 1}
+  dodgeTint: {r: 0.5613208, g: 0.95299864, b: 1, a: 1}
+  invTimeDodge: 0.25
+  dodgeCooldownTime: 0.5
+  dodgeCooldownTint: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
   dodgeSize: {x: 0.3869133, y: 0.75}
   dodgeOffset: {x: 0, y: -0.625}
   runSpeed: 9
@@ -516,7 +517,6 @@ MonoBehaviour:
   jumpVolume: 0.85
   dodgeSound: {fileID: 8300000, guid: 3ad9b205e5ce146449c5be671cc54df2, type: 3}
   pitchRange: {x: -0.1, y: 0.1}
-  dodgeTint: {r: 0.5613208, g: 0.95299864, b: 1, a: 1}
   _velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &1723836365
 MonoBehaviour:

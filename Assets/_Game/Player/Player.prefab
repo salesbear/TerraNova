@@ -389,7 +389,7 @@ MonoBehaviour:
     m_Bits: 257
   triggerMask:
     serializedVersion: 2
-    m_Bits: 40448
+    m_Bits: 56832
   oneWayPlatformMask:
     serializedVersion: 2
     m_Bits: 0
@@ -428,7 +428,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  totalHorizontalRays: 5
+  totalHorizontalRays: 6
   totalVerticalRays: 3
 --- !u!61 &3273063542259548182
 BoxCollider2D:
@@ -494,19 +494,24 @@ MonoBehaviour:
   jumpHeight: 4
   maxFallSpeed: 20
   peakGravity: -12
+  jumpHoldGravity: -19
   wallJumpHeight: 3.5
-  dodgeSpeed: 20
-  dodgeTime: 0.233
+  dodgeSpeed: 18
+  dodgeTime: 0.25
+  invTimeDodge: 0.22
+  dodgeCooldownTime: 0.15
+  dodgeCooldownTint: {r: 0.70980394, g: 0.70980394, b: 0.70980394, a: 1}
   dodgeSize: {x: 0.3869133, y: 0.75}
   dodgeOffset: {x: 0, y: -0.625}
   runSpeed: 9
   wallJumpSpeed: 14
   groundDamping: 10
   inAirDamping: 4
-  invTime: 0.21
   invTimeDamaged: 1.25
   knockbackTime: 0.25
   flashTime: 0.08
+  coyoteTime: 0.15
+  coyoteTimeDodge: 0.15
   jumpSound: {fileID: 8300000, guid: ae83ff4dfc3c3574599d35d93de055f6, type: 3}
   jumpVolume: 0.85
   dodgeSound: {fileID: 8300000, guid: 3ad9b205e5ce146449c5be671cc54df2, type: 3}

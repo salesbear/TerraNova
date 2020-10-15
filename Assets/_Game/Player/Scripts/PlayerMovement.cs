@@ -28,8 +28,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float dodgeSpeed = 12f;
     [Tooltip("how long the player dodges for")]
     [SerializeField] float dodgeTime = 0.25f;
+    [Tooltip("The color used to tint the sprite when the player is dodging and invincible")]
+    [SerializeField] private Color dodgeTint;
     [Tooltip("how long the player is invincible while dodging")]
     [SerializeField] float invTimeDodge = 0.2f;
+    [Tooltip("how long the player has to wait between dodges")]
+    [SerializeField] float dodgeCooldownTime = 0.15f;
+    [Tooltip("the color the player is tinted by when they can't dodge")]
+    [SerializeField] Color dodgeCooldownTint;
     [Tooltip("The size of the player's box collider while dodging")]
     [SerializeField] Vector2 dodgeSize;
     [Tooltip("The offset for the player's box collider while dodging")]
@@ -59,8 +65,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float coyoteTime = 0.1f;
     [Tooltip("the amount of time that the player can still jump after rolling off of an edge")]
     [SerializeField] float coyoteTimeDodge = 0.15f;
-    private float flashTimer = 0;
+
+    float flashTimer = 0;
     float dodgeTimer = 0.0f;
+    float dodgeCooldownTimer = 0f;
     float coyoteTimer = 0f;
     //a separate timer used to handle dodge invincibility frames
     float dodgeInvTimer = 0f;
@@ -78,11 +86,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private AudioClip dodgeSound;
     [Tooltip("the amount that the pitch can shift, X is lower bound, Y is upper bound")]
     [SerializeField] Vector2 pitchRange;
-
-    [Space]
-    [Header("Misc.")]
-    [Tooltip("The color used to tint the sprite when the player is dodging and invincible")]
-    [SerializeField] private Color dodgeTint;
     private Color m_initialColor;
 
     private bool leftPressed = false; //bools used to handle when both left and right are pressed
@@ -92,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
     public bool facingRight { get { return transform.localScale.x > 0f; } }
 
     private bool canJump = true;
+    private bool canDodge { get { return dodgeCooldownTimer <= 0; } }
     private bool aiming { get { return _stateController.state == PlayerState.Aim; } }
     public bool grounded { get { return _controller.isGrounded; } }
     public bool invincible { get { return (invTimer > 0 || dodgeInvTimer > 0); } }
@@ -242,7 +246,7 @@ public class PlayerMovement : MonoBehaviour
             HandleFacingAndHSpeed();
         }
         //if we can dodge, and the player is trying to
-        if (Input.GetButtonDown("Dodge") && (int)_stateController.state < 7)
+        if (canDodge && Input.GetButtonDown("Dodge") && (int)_stateController.state < 7)
         {
             Dodge();
         }
@@ -318,10 +322,19 @@ public class PlayerMovement : MonoBehaviour
                 m_spriteRenderer.enabled = true;
             }
         }
+        #region dodgeTimers
         if (dodgeInvTimer > 0)
         {
             dodgeInvTimer -= Time.deltaTime;
             if (dodgeInvTimer <= 0)
+            {
+                m_spriteRenderer.color = dodgeCooldownTint;
+            }
+        }
+        if (dodgeCooldownTimer > 0)
+        {
+            dodgeCooldownTimer -= Time.deltaTime;
+            if (dodgeCooldownTimer <= 0)
             {
                 m_spriteRenderer.color = m_initialColor;
             }
@@ -344,6 +357,7 @@ public class PlayerMovement : MonoBehaviour
                     {
                         _stateController.ChangeState(3);
                     }
+                    dodgeCooldownTimer = dodgeCooldownTime;
                 }
                 else
                 {
@@ -352,6 +366,7 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+        #endregion
     }
 
     /// <summary>
@@ -544,7 +559,7 @@ public class PlayerMovement : MonoBehaviour
             if (_player.wallJumpUnlocked && (_controller.collisionState.right || _controller.collisionState.left) && (int)_stateController.state < 5)
             {
                 max = wallSlideMaxSpeed;
-                if (!_controller.isGrounded && _velocity.y < 0)
+                if (!_controller.isGrounded && _velocity.y < 0 &&_stateController.state != PlayerState.WallSlide)
                 {
                     _stateController.ChangeState(4); //change state to wall sliding
                 }
@@ -552,6 +567,10 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 max = maxFallSpeed;
+                if (!_controller.isGrounded && _velocity.y < 0 && (int)_stateController.state < 6 && _stateController.state != PlayerState.Fall)
+                {
+                    _stateController.ChangeState(PlayerState.Fall);
+                }
             }
             if (_velocity.y < -max)
             {
@@ -563,7 +582,7 @@ public class PlayerMovement : MonoBehaviour
         {
             _stateController.ChangeState(PlayerState.Fall);
         }
-        
+
     }
 
     /// <summary>

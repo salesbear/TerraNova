@@ -233,7 +233,7 @@ MonoBehaviour:
   damageColor: {r: 1, g: 0.23113209, b: 0.23113209, a: 1}
   invincibilityTime: 0.15
   hurtClip: {fileID: 8300000, guid: e4b226575547b5d4aa5e046a36c21569, type: 3}
-  dropChance: 100
+  dropChance: 30
 --- !u!82 &7942651591523142179
 AudioSource:
   m_ObjectHideFlags: 0

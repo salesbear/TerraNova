@@ -13,16 +13,18 @@ public class PlayerMovement : MonoBehaviour
     [Range(-50,-1)]   [SerializeField] float gravity = -25f;
     [Tooltip("the fastest you can fall while sliding down a wall")]
     [Range(0, 25f)] [SerializeField] float wallSlideMaxSpeed = 5f;
-    [SerializeField] float jumpHeight = 3f;
+    [Tooltip("how far up you jump if you tab the button")]
+    [SerializeField] float jumpHeight = 4f;
+    [Tooltip("how far up you jump if you hold the button down")]
+    [SerializeField] float maxJumpHeight = 5f;
     [Tooltip("the fastest you can fall normally")]
     [SerializeField] float maxFallSpeed = 15f;
     [Tooltip("Gravity used at the peak of the jump")]
     [SerializeField] float peakGravity = -12f;
     [Tooltip("the amount of gravity applied to the player while holding the jump button")]
-    [Range(-50,-1)]
-    [SerializeField] float jumpHoldGravity = -20f;
     [SerializeField] float wallJumpHeight = 3.5f;
-    private float vel_peak = 1.5f; //this is the magnitude of vertical velocity that signifies that the character is at the peak of their jump
+    [Tooltip("the speed that signifies that the player is at the peak of their jump and should hang in the air")]
+    [SerializeField] private float speed_peak = 1.5f; //this is the magnitude of vertical velocity that signifies that the character is at the peak of their jump
     [Space]
     [Header("Dodge Stuff")]
     [SerializeField] float dodgeSpeed = 12f;
@@ -356,9 +358,15 @@ public class PlayerMovement : MonoBehaviour
                     {
                         _stateController.ChangeState(0);
                     }
-                    else
+                    //if we're falling, change state to falling
+                    else if (_velocity.y < 0)
                     {
                         _stateController.ChangeState(3);
+                    }
+                    //if we're moving up, change state to jumping
+                    else
+                    {
+                        _stateController.ChangeState(2);
                     }
                     dodgeCooldownTimer = dodgeCooldownTime;
                 }
@@ -546,11 +554,21 @@ public class PlayerMovement : MonoBehaviour
         //    _stateController.ChangeState(PlayerState.Jump);
         //}
         //if they aren't grounded and we're going up slowly, slow down gravity to give the player a moment to adjust their jump
-        if (holdingJump && _velocity.y > vel_peak && _stateController.state == PlayerState.Jump)
+        if (holdingJump && _velocity.y > speed_peak && _stateController.state == PlayerState.Jump)
         {
-            _velocity.y += jumpHoldGravity * Time.deltaTime;
+            float gravityMultiplier;
+            if (_stateController.previousState == PlayerState.WallSlide)
+            {
+                gravityMultiplier = wallJumpHeight / maxJumpHeight;
+            }
+            else
+            {
+                gravityMultiplier = jumpHeight / maxJumpHeight;
+            }
+            //Debug.Log("gravity multiplier: " + gravityMultiplier);
+            _velocity.y += gravity * Time.deltaTime * gravityMultiplier;
         }
-        else if (_velocity.y < vel_peak && _stateController.state == PlayerState.Jump)
+        else if (_velocity.y < speed_peak && _stateController.state == PlayerState.Jump)
         {
             _velocity.y += peakGravity * Time.deltaTime;
         }

@@ -489,13 +489,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c6aee28e39a6bf489a5f74718e87403, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravity: -25
+  gravity: -35
   wallSlideMaxSpeed: 5
-  jumpHeight: 4
+  jumpHeight: 3.4
+  maxJumpHeight: 5.3
   maxFallSpeed: 20
-  peakGravity: -12
-  jumpHoldGravity: -19
+  peakGravity: -15
   wallJumpHeight: 3.5
+  speed_peak: 1
   dodgeSpeed: 18
   dodgeTime: 0.25
   dodgeTint: {r: 0.5613208, g: 0.95299864, b: 1, a: 1}

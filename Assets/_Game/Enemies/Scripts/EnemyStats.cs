@@ -21,7 +21,6 @@ public class EnemyStats : MonoBehaviour
     [Tooltip("The percent chance that the enemy drops something on death")]
     [Range(0,100)]
     [SerializeField] int dropChance = 30;
-    AudioSource audioSource;
     float invincibilityTimer = 0f;
 
     bool invincible { get { return invincibilityTimer > 0; } }
@@ -32,7 +31,6 @@ public class EnemyStats : MonoBehaviour
         {
             sprite = GetComponent<SpriteRenderer>();
         }
-        audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -66,7 +64,7 @@ public class EnemyStats : MonoBehaviour
             hp -= amount;
             sprite.color = damageColor;
             invincibilityTimer = invincibilityTime;
-            AudioSource.PlayClipAtPoint(hurtClip, transform.position);
+            AudioManager.instance.PlaySound(hurtClip, 0.8f);
         }
 
         if (hp <= 0)

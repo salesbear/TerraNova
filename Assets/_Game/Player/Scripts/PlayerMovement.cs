@@ -167,6 +167,10 @@ public class PlayerMovement : MonoBehaviour
             //}
         }
         //Debug.Log("onTriggerEnterEvent: " + col.gameObject.name);
+        //if (col.gameObject.layer == 16)
+        //{
+        //    Debug.Log("Inside camera trigger");
+        //}
     }
 
 

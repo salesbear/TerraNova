@@ -209,6 +209,7 @@ public class PlayerMovement : MonoBehaviour
             m_playerCollision.offset = startOffset;
             m_playerCollision.size = startSize;
             _controller.recalculateDistanceBetweenRays();
+            dodgeCooldownTimer = dodgeCooldownTime;
         }
         //if newstate is one in which we cannot move horizontally, mark that
         if ((int)newstate >= 8)
@@ -557,8 +558,9 @@ public class PlayerMovement : MonoBehaviour
         //{
         //    _stateController.ChangeState(PlayerState.Jump);
         //}
-        //if they aren't grounded and we're going up slowly, slow down gravity to give the player a moment to adjust their jump
-        if (holdingJump && _velocity.y > speed_peak && _stateController.state == PlayerState.Jump)
+        //if they're holding jump and they're moving upwards faster than the speed at the peak of their jump, reduce grav so they can jump higher
+        //state change is here so that you can't mess with knockback velocities
+        if (holdingJump && _velocity.y > speed_peak && (_stateController.state == PlayerState.Jump || _stateController.state == PlayerState.Dodge))
         {
             float gravityMultiplier;
             if (_stateController.previousState == PlayerState.WallSlide)
@@ -572,6 +574,7 @@ public class PlayerMovement : MonoBehaviour
             //Debug.Log("gravity multiplier: " + gravityMultiplier);
             _velocity.y += gravity * Time.deltaTime * gravityMultiplier;
         }
+        //slow gravity near the peak of their jump to help them plan where they're going to fall
         else if (_velocity.y < speed_peak && _stateController.state == PlayerState.Jump)
         {
             _velocity.y += peakGravity * Time.deltaTime;

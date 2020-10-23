@@ -33,7 +33,7 @@ public class PlayerAttack : MonoBehaviour
         if (_stateController.previousState == PlayerState.Attack)
         {
             DisableGroundHitBoxes();
-
+            ResetTimers();
         }
     }
 

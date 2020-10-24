@@ -32,7 +32,7 @@ public class ManaBarUpdater : MonoBehaviour
     {
         if (player.maxMana != fill.maxValue)
         {
-            fill.maxValue = player.maxMana;
+            fill.maxValue = Mathf.Max(player.maxMana,1);
         }
 
         if (player.mana != fill.value)

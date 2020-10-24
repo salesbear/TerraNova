@@ -502,13 +502,13 @@ MonoBehaviour:
   dodgeTint: {r: 0.5613208, g: 0.95299864, b: 1, a: 1}
   invTimeDodge: 0.25
   dodgeCooldownTime: 0.5
-  dodgeCooldownTint: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
+  dodgeCooldownTint: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
   dodgeSize: {x: 0.3869133, y: 0.75}
   dodgeOffset: {x: 0, y: -0.625}
   runSpeed: 9
   wallJumpSpeed: 14
-  groundDamping: 10
-  inAirDamping: 4
+  groundDamping: 12
+  inAirDamping: 3.5
   invTimeDamaged: 1.25
   knockbackTime: 0.25
   flashTime: 0.08

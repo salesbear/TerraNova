@@ -9,6 +9,7 @@ public class ManaBarUpdater : MonoBehaviour
     [SerializeField] Slider fill;
     [Tooltip("the time it takes for the mana bar to update")]
     [SerializeField] float timeToChange = 0.15f;
+    float _smoothDampVelocity;
     [Tooltip("the PlayerAttributes component of the player, optional (but probably better for performance to put this in)")]
     [SerializeField] PlayerAttributes player;
     
@@ -29,14 +30,14 @@ public class ManaBarUpdater : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.maxMana > fill.maxValue)
+        if (player.maxMana != fill.maxValue)
         {
             fill.maxValue = player.maxMana;
         }
 
         if (player.mana != fill.value)
         {
-            fill.value = Mathf.Lerp(fill.value, player.mana, Time.deltaTime / timeToChange);
+            fill.value = Mathf.SmoothDamp(fill.value, player.mana, ref _smoothDampVelocity, timeToChange);
         }
     }
 }

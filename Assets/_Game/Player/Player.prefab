@@ -513,7 +513,7 @@ MonoBehaviour:
   knockbackTime: 0.25
   flashTime: 0.08
   coyoteTime: 0.15
-  coyoteTimeDodge: 0.15
+  coyoteTimeDodge: 0.2
   jumpSound: {fileID: 8300000, guid: ae83ff4dfc3c3574599d35d93de055f6, type: 3}
   jumpVolume: 0.85
   dodgeSound: {fileID: 8300000, guid: 3ad9b205e5ce146449c5be671cc54df2, type: 3}

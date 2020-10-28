@@ -1103,14 +1103,6 @@ PrefabInstance:
       propertyPath: dodgeDamping
       value: 0.1
       objectReference: {fileID: 0}
-    - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: inAirDamping
-      value: 3.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
-      propertyPath: groundDamping
-      value: 12
-      objectReference: {fileID: 0}
     - target: {fileID: 3273063542259548176, guid: 816686e638156bd4687855f21958d5f9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3265,14 +3257,6 @@ PrefabInstance:
       objectReference: {fileID: 1666091106}
     - target: {fileID: 3211175290452303592, guid: 1f60529086595514cbab7e3eb17592f9, type: 3}
       propertyPath: lockedToBounds
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3211175290452303592, guid: 1f60529086595514cbab7e3eb17592f9, type: 3}
-      propertyPath: cameraBounds.m_Extent.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3211175290452303592, guid: 1f60529086595514cbab7e3eb17592f9, type: 3}
-      propertyPath: cameraBounds.m_Extent.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3211175290452303594, guid: 1f60529086595514cbab7e3eb17592f9, type: 3}

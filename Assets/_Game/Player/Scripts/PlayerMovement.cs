@@ -193,10 +193,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 coyoteTimer = coyoteTime;
             }
-            else if (_stateController.previousState == PlayerState.Dodge)
-            {
-                coyoteTimer = coyoteTimeDodge;
-            }
         }
         if (newstate == PlayerState.Dodge)
         {
@@ -298,6 +294,14 @@ public class PlayerMovement : MonoBehaviour
         if (coyoteTimer > 0)
         {
             coyoteTimer -= Time.deltaTime;
+        }
+        //if we're dodging and we were on the ground in our last state, set coyote time
+        if (_stateController.state == PlayerState.Dodge && 
+            ((int)_stateController.previousState <= 1 
+            || _stateController.previousState == PlayerState.Attack 
+            || _stateController.previousState == PlayerState.Aim))
+        {
+            coyoteTimer = coyoteTimeDodge;
         }
         //knockback timer
         if (knockbackTimer > 0)

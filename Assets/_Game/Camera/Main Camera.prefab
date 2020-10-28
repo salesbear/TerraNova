@@ -103,8 +103,8 @@ MonoBehaviour:
   transitionTime: 0.6
   smoothDampTimeWallslide: 0.5
   transform: {fileID: 0}
-  cameraOffset: {x: -3, y: -2, z: 10}
-  fallOffset: {x: -3, y: -4, z: 10}
+  cameraOffset: {x: -2, y: -2, z: 10}
+  fallOffset: {x: -2, y: 0, z: 10}
   lockedToBounds: 1
   cameraBounds:
     m_Center: {x: -2.5, y: 18, z: 0}

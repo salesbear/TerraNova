@@ -85,10 +85,6 @@ public class SmoothFollow : MonoBehaviour
         //set smooth damp time and camera offset based on our state
         switch((int)_stateController.state)
         {
-            case 3:
-                cameraOffsetLocal = fallOffset;
-                smoothDampTimeLocal = smoothDampTime;
-                break;
             case 4:
                 cameraOffsetLocal = cameraOffsetWallslide;
                 smoothDampTimeLocal = smoothDampTimeWallslide;
@@ -102,6 +98,14 @@ public class SmoothFollow : MonoBehaviour
                 cameraOffsetLocal = cameraOffset;
                 smoothDampTimeLocal = smoothDampTime;
                 break;
+        }
+        //if we're falling, or we're dodging and falling, set our offset so we can still see our character
+        if (_stateController.state == PlayerState.Fall || 
+            (_stateController.state == PlayerState.Dodge 
+            && ! _playerController.isGrounded
+            && _playerController.velocity.y < 0))
+        {
+            cameraOffsetLocal = fallOffset;
         }
         if (transitionTimer > 0)
         {

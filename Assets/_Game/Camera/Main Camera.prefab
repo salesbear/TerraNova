@@ -97,13 +97,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  smoothDampTime: 0.2
+  smoothDampTime: 0.3
   smoothDampTimeAim: 0.35
   smoothDampTimeBoundsTransition: 0.6
   transitionTime: 0.6
   smoothDampTimeWallslide: 0.5
   transform: {fileID: 0}
   cameraOffset: {x: -3, y: -2, z: 10}
+  fallOffset: {x: -3, y: -4, z: 10}
   lockedToBounds: 1
   cameraBounds:
     m_Center: {x: -2.5, y: 18, z: 0}

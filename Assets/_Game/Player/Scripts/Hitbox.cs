@@ -32,10 +32,19 @@ public class Hitbox : MonoBehaviour
                 //Debug.Log("Opening Door");
                 door.Open(false);
             }
-            //else
+            //else      
             //{
             //    //Debug.Log("Door is null");
             //}
+        }
+        //if it's a breakable wall
+        else if (collision.gameObject.layer == 18)
+        {
+            BreakableWall breakableWall = collision.gameObject.GetComponent<BreakableWall>();
+            if (breakableWall != null)
+            {
+                breakableWall.BreakWall();
+            }
         }
     }
 

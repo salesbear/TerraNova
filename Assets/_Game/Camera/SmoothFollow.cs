@@ -20,6 +20,7 @@ public class SmoothFollow : MonoBehaviour
 	[HideInInspector]
 	public new Transform transform;
 	public Vector3 cameraOffset;
+    public Vector3 fallOffset;
     public bool lockedToBounds;
     [Tooltip("the bounds that the camera is locked to")]
     public Bounds cameraBounds;
@@ -84,10 +85,10 @@ public class SmoothFollow : MonoBehaviour
         //set smooth damp time and camera offset based on our state
         switch((int)_stateController.state)
         {
-            //case 3:
-            //    cameraOffsetLocal = cameraOffsetFalling;
-            //    smoothDampTimeLocal = smoothDampTimeFalling;
-            //    break;
+            case 3:
+                cameraOffsetLocal = fallOffset;
+                smoothDampTimeLocal = smoothDampTime;
+                break;
             case 4:
                 cameraOffsetLocal = cameraOffsetWallslide;
                 smoothDampTimeLocal = smoothDampTimeWallslide;

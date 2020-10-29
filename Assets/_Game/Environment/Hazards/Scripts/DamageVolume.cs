@@ -17,9 +17,15 @@ public class DamageVolume : MonoBehaviour
         {
             PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
             Vector3 knockbackVector = new Vector3();
-            knockbackVector = collision.gameObject.transform.position - transform.position;
-            knockbackVector = knockbackVector.normalized;
-            knockbackVector.y += yOffset;
+            if (transform.position.x >= collision.gameObject.transform.position.x)
+            {
+                knockbackVector.x = -1;
+            }
+            else
+            {
+                knockbackVector.x = 1;
+            }
+            knockbackVector.y = yOffset;
             player.TakeDamage(damage, knockbackVector * knockbackSpeed);
         }
     }

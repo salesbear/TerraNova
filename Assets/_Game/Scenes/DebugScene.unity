@@ -3141,6 +3141,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Thorns
       objectReference: {fileID: 0}
+    - target: {fileID: 6857843360672555229, guid: 6188f03e6570f91428985c1592bfd94d, type: 3}
+      propertyPath: yOffset
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6857843360821043735, guid: 6188f03e6570f91428985c1592bfd94d, type: 3}
+      propertyPath: yOffset
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6188f03e6570f91428985c1592bfd94d, type: 3}
 --- !u!1001 &7350882709941533808

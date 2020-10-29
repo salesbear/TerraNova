@@ -31,13 +31,16 @@ public class PlayerAttributes : MonoBehaviour
     [SerializeField] private AudioClip hurtSound;
     [Tooltip("The sound that plays when the player dies")]
     [SerializeField] private AudioClip deathSound;
+    [Tooltip("The sound that plays when the player picks up a heart piece")]
+    [SerializeField] private AudioClip heartPieceSound;
     [Tooltip("the range for randomizing the pitch")]
     [SerializeField] private Vector2 pitchRange = new Vector2(-0.1f,0.1f);
     
     [Header("Debug")]
     [Tooltip("Allows you to increase your health, max health, mana, and max mana at will")]
     [SerializeField] bool debugMode = true;
-
+    [ReadOnly]
+    [SerializeField] int heartPiecesHeld = 0;
     public static event Action<int> MaxHealthChanged = delegate { };
 
     //PlayerMovement1 player;
@@ -195,5 +198,19 @@ public class PlayerAttributes : MonoBehaviour
         AudioManager.instance.PlaySound(deathSound, pitchRange);
         ps_controller.ChangeState(PlayerState.Dead);
         // TODO: put up UI telling player how to restart
+    }
+
+    /// <summary>
+    /// give a heart piece to the player, if they have two heart pieces, increase their max health and reset the count
+    /// </summary>
+    public void AddHeartPiece()
+    {
+        heartPiecesHeld++;
+        AudioManager.instance.PlaySound(heartPieceSound);
+        if (heartPiecesHeld == 2)
+        {
+            IncreaseMaxHealth();
+            heartPiecesHeld = 0;
+        }
     }
 }

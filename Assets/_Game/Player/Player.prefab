@@ -554,8 +554,10 @@ MonoBehaviour:
   manaRegenSound: {fileID: 8300000, guid: 11543e6bf345946498a71ee881935507, type: 3}
   hurtSound: {fileID: 8300000, guid: f2e7ef3d80b6f914881638d0b82c4fbb, type: 3}
   deathSound: {fileID: 8300000, guid: eec8846c55ed79346861d1d73fd53be0, type: 3}
+  heartPieceSound: {fileID: 8300000, guid: 0deb39adc49c49e4abde543f32d756bd, type: 3}
   pitchRange: {x: -0.1, y: 0.1}
   debugMode: 1
+  heartPiecesHeld: 0
 --- !u!114 &282825911
 MonoBehaviour:
   m_ObjectHideFlags: 0

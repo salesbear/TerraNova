@@ -157,15 +157,15 @@ public class PlayerMovement : MonoBehaviour
     void onTriggerEnterEvent(Collider2D col)
     {
         //if the object is in the hazard or enemy layer
-        if (col.gameObject.layer == 9 || col.gameObject.layer == 11)
-        {
-            //DamageVolume temp = col.GetComponent<DamageVolume>();
-            //if (temp != null && !invincible && m_stateController.state != PlayerState.Dead)
-            //{
-            //    TakeKnockback(temp.knockbackVector);
-            //    m_player.TakeDamage(temp.damage);
-            //}
-        }
+        //if (col.gameObject.layer == 9 || col.gameObject.layer == 11)
+        //{
+        //    DamageVolume temp = col.GetComponent<DamageVolume>();
+        //    if (temp != null && !invincible && _stateController.state != PlayerState.Dead)
+        //    {
+                
+                
+        //    }
+        //}
         //Debug.Log("onTriggerEnterEvent: " + col.gameObject.name);
         //if (col.gameObject.layer == 16)
         //{

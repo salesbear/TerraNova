@@ -4,10 +4,21 @@ using UnityEngine;
 
 public class Hitbox : MonoBehaviour
 {
+    [Tooltip("The knockback applied to whatever you hit. X should be positive if you're using player facing")]
     [SerializeField] Vector3 knockback;
     [SerializeField] int damage = 2; //the amount of damage you do to enemies
     bool hit_enemy = false;
-
+    
+    PlayerMovement player;
+    [Tooltip("If true, knockback direction is determined by player facing")]
+    [SerializeField] bool usePlayerFacing = true;
+    private void Awake()
+    {
+        if (usePlayerFacing)
+        {
+            player = GetComponentInParent<PlayerMovement>();
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //Debug.Log("Object Detected from Hitbox");
@@ -19,7 +30,12 @@ public class Hitbox : MonoBehaviour
             EnemyStats enemy = collision.gameObject.GetComponentInParent<EnemyStats>();
             if (enemy != null)
             {
-                enemy.LogDamage(damage, knockback);
+                Vector3 knockbackTemp = knockback;
+                if (usePlayerFacing)
+                {
+                    knockbackTemp.x = (player.facingRight) ? knockback.x : -knockback.x;
+                }
+                enemy.LogDamage(damage, knockbackTemp);
             }
         }
 

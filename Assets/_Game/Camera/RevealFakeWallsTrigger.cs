@@ -45,7 +45,7 @@ public class RevealFakeWallsTrigger : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
         //if it's the player
-        if (collision.gameObject.layer == 10)
+        if (collision.CompareTag("Player"))
         {
             invisible = true;
         }
@@ -53,7 +53,7 @@ public class RevealFakeWallsTrigger : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == 10)
+        if (collision.CompareTag("Player"))
         {
             invisible = false;
         }

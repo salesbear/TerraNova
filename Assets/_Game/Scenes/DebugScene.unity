@@ -773,8 +773,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 612593277}
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -13.307, y: 9.1, z: 0}
-  m_LocalScale: {x: 2.3809152, y: 7.599515, z: 1}
+  m_LocalPosition: {x: -13, y: 9, z: 0}
+  m_LocalScale: {x: 2, y: 12, z: 1}
   m_Children: []
   m_Father: {fileID: 1629851150}
   m_RootOrder: 5
@@ -1099,6 +1099,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 765732677, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: knockback.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 765732677, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: knockback.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1051209813, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: knockback.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1051209813, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: knockback.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 1685416969, guid: 816686e638156bd4687855f21958d5f9, type: 3}
       propertyPath: dodgeDamping
       value: 0.1
@@ -2918,13 +2934,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1005784218, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
+      propertyPath: sightRange
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.222
       objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11.29
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.z

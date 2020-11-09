@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
 {
     
     [Header("Vertical Movement")]
-    [Range(-70,-1)]   [SerializeField] float gravity = -25f;
+    [Range(-70,-1)] public float gravity = -25f;
     [Tooltip("the fastest you can fall while sliding down a wall")]
     [Range(0, 25f)] [SerializeField] float wallSlideMaxSpeed = 5f;
     [Tooltip("how far up you jump if you tab the button")]

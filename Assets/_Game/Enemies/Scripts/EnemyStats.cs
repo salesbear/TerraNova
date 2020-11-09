@@ -24,6 +24,7 @@ public class EnemyStats : MonoBehaviour
     float invincibilityTimer = 0f;
 
     bool invincible { get { return invincibilityTimer > 0; } }
+    EnemyMovement enemy;
 
     private void Awake()
     {
@@ -31,6 +32,7 @@ public class EnemyStats : MonoBehaviour
         {
             sprite = GetComponent<SpriteRenderer>();
         }
+        enemy = GetComponent<EnemyMovement>();
     }
 
     private void Start()
@@ -58,13 +60,16 @@ public class EnemyStats : MonoBehaviour
 
     void TakeDamage(int amount, Vector3 knockbackVector)
     {
-        //TODO: implement enemy knockback, display enemy damage
         if (!invincible)
         {
             hp -= amount;
             sprite.color = damageColor;
             invincibilityTimer = invincibilityTime;
             AudioManager.instance.PlaySound(hurtClip, 0.8f);
+            if (enemy != null)
+            {
+                enemy.TakeKnockback(knockbackVector);
+            }
         }
 
         if (hp <= 0)
@@ -86,7 +91,7 @@ public class EnemyStats : MonoBehaviour
     }
 
     /// <summary>
-    /// log the amount of damage that the enemy takes, they take less damage if the player doesn't hit them
+    /// log the amount of damage that the enemy takes, they take less damage if the player doesn't hit them with the sweet spot
     /// </summary>
     /// <param name="amount"></param>
     /// <param name="knockbackVector"></param>
@@ -95,11 +100,12 @@ public class EnemyStats : MonoBehaviour
         if (damageTaken == 0)
         {
             damageTaken = amount;
+            knockbackTaken = knockbackVector;
         }
-        else
+        else if (amount < damageTaken)
         {
-            damageTaken = Mathf.Min(damageTaken, amount);
+            damageTaken = amount;
+            knockbackTaken = knockbackVector;
         }
-        knockbackTaken = knockbackVector;
     }
 }

@@ -627,7 +627,12 @@ public class PlayerMovement : MonoBehaviour
         if (!invincible)
         {
             _player.TakeDamage(amount);
-            if (_stateController.state != PlayerState.Dead)
+            //don't take knockback if you dodge
+            if (_stateController.state == PlayerState.Dodge)
+            {
+                invTimer = invTimeDamaged;
+            }
+            else if (_stateController.state != PlayerState.Dead)
             {
                 _velocity = knockbackVel;
                 knockbackTimer = knockbackTime;

@@ -1119,6 +1119,18 @@ PrefabInstance:
       propertyPath: dodgeDamping
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 1723836373, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: wallJumpUnlocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1723836373, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: fireUnlocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1723836373, guid: 816686e638156bd4687855f21958d5f9, type: 3}
+      propertyPath: debugMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3273063542259548176, guid: 816686e638156bd4687855f21958d5f9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1468,6 +1480,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1005784218, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
+      propertyPath: turnSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005784218, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
+      propertyPath: moveSpeed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005784218, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
+      propertyPath: groundDamping
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005784218, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
+      propertyPath: returnHomeSpeed
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -30.21
@@ -2934,17 +2962,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1005784218, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
-      propertyPath: sightRange
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -13.222
       objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11
+      value: 11.17
       objectReference: {fileID: 0}
     - target: {fileID: 2903128726959243561, guid: b11ffb4c19003954a88317a31524fcc5, type: 3}
       propertyPath: m_LocalPosition.z

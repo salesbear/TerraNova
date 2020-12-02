@@ -6,7 +6,8 @@ using UnityEngine;
 public class Fireball : MonoBehaviour
 {
     [Tooltip("the amount of knockback enemies take when hit by this")]
-    [SerializeField] Vector3 knockback;
+    [SerializeField] Vector2 knockbackSpeed = new Vector2(3,10);
+    [SerializeField] float minYKnockback = 2f;
     [SerializeField] int damage = 2; //the amount of damage you do to enemies
     [SerializeField] float speed = 12f;
     [SerializeField] float timeToDespawn = 2f;
@@ -35,15 +36,24 @@ public class Fireball : MonoBehaviour
         //if it's an enemy
         if (collision.gameObject.layer == 11)
         {
-            //Debug.Log("Enemy Hit: " + collision.gameObject.name);
-            EnemyStats enemy = collision.gameObject.GetComponentInParent<EnemyStats>();
-            if (enemy != null)
+            if (collision.CompareTag("Enemy"))
             {
-                enemy.LogDamage(damage, knockback);
+                EnemyStats enemy = collision.gameObject.GetComponentInParent<EnemyStats>();
+                if (enemy != null)
+                {
+                    Vector3 tempKnockback = m_rigidbody.velocity.normalized * knockbackSpeed;
+                    if (Mathf.Abs(tempKnockback.y) < minYKnockback)
+                    {
+                        tempKnockback.y = knockbackSpeed.y * 0.5f;
+                    }
+                    enemy.LogDamage(damage, tempKnockback);
+                }
+                Kill();
             }
+            //Debug.Log("Enemy Hit: " + collision.gameObject.name);
         }
         //if we hit a door
-        if (collision.gameObject.layer == 12)
+        else if (collision.gameObject.layer == 12)
         {
             Door door = collision.gameObject.GetComponentInParent<Door>();
             if (door != null)
@@ -58,9 +68,10 @@ public class Fireball : MonoBehaviour
                     return;
                 }
             }
+            Kill();
         }
         //if we hit a switch
-        if (collision.gameObject.layer == 14)
+        else if (collision.gameObject.layer == 14)
         {
             Switch theSwitch = collision.gameObject.GetComponent<Switch>();
             if (theSwitch != null)

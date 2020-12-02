@@ -138,12 +138,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbdd9ee1ab136bb48a0e502142639dcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 0, y: 0, z: 0}
+  knockbackSpeed: {x: 3, y: 20}
   damage: 2
   speed: 12
   timeToDespawn: 2
   explosionClip: {fileID: 8300000, guid: d9dfdcf870d4ea34c86701194d5d7133, type: 3}
-  volume: 1
 --- !u!61 &815141781
 BoxCollider2D:
   m_ObjectHideFlags: 0

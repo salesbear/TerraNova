@@ -7,7 +7,7 @@ using Prime31;
 [RequireComponent(typeof(CharacterController2D))]
 public class EnemyMovement : MonoBehaviour
 {
-    public enum EnemyBehavior { Idle = 0,Return, Wander }
+    public enum EnemyBehavior { Idle = 0,Chase,Return, Wander }
 
     CharacterController2D _controller;
     Transform target;
@@ -16,6 +16,7 @@ public class EnemyMovement : MonoBehaviour
     [Header("Player Detection")]
     [Tooltip("How far the enemy can see")]
     [SerializeField] float sightRange = 10f;
+    [SerializeField] float peripheralVision = 3f;
     [Tooltip("the layers that the enemy can see")]
     [SerializeField] LayerMask sightMask = new LayerMask();
 
@@ -29,7 +30,10 @@ public class EnemyMovement : MonoBehaviour
     [Range(1,100)]
     [SerializeField] float maxFallSpeed = 20f;
     [SerializeField] DetectGround groundDetector;
-
+    [SerializeField] DetectWalls wallDetector;
+    [Tooltip("How long the enemy waits before turning around, randomized to be between x and y")]
+    [SerializeField] Vector2 waitTime = new Vector2(0.4f, 1f);
+    float waitTimer = 0f;
     bool stunned { get { return stunTimer > 0; } }
     [Header("Knockback")]
     [Tooltip("How long the enemy is stunned for when hit")]
@@ -62,6 +66,15 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField]
     EnemyBehavior currentBehavior;
     private bool facingRight { get { return transform.localScale.x > 0f; } }
+    [ReadOnly]
+    [SerializeField]
+    bool inGroundLastFrame = true;
+    [ReadOnly]
+    [SerializeField]
+    bool inWallLastFrame = false;
+    [ReadOnly]
+    [SerializeField]
+    bool inHazardLastFrame = false;
 
     private void Awake()
     {
@@ -75,6 +88,10 @@ public class EnemyMovement : MonoBehaviour
         if (groundDetector == null)
         {
             groundDetector = GetComponentInChildren<DetectGround>();
+        }
+        if (wallDetector == null)
+        {
+            wallDetector = GetComponentInChildren<DetectWalls>();
         }
     }
     // Start is called before the first frame update
@@ -109,51 +126,63 @@ public class EnemyMovement : MonoBehaviour
         {
             stunTimer -= Time.deltaTime;
         }
-        //reset this each frame in case player isn't visible anymore
-        playerSpotted = false;
-        if (Vector3.Distance(transform.position, target.position) < sightRange)
+        if (waitTimer > 0)
         {
-            RaycastHit2D raycastHit;
-            raycastHit = Physics2D.Raycast(transform.position, target.position - transform.position, sightRange, sightMask);
-            Debug.DrawRay(transform.position, target.position - transform.position);
-            if (raycastHit.collider.CompareTag("Player"))
+            waitTimer -= Time.deltaTime;
+            if (waitTimer <= 0 && currentBehavior == EnemyBehavior.Wander)
             {
+                if (wallDetector.inWall || wallDetector.inHazard || !groundDetector.inGround)
+                {
+                    transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+                }
+            }
+        }
+        //look to see if we can see the player
+        LookForPlayer();
+
+        //determine how to move based off of current behavior
+        switch(currentBehavior)
+        {
+            case EnemyBehavior.Idle:
+                if (_controller.isGrounded)
+                {
+                    normalizedHorizontalSpeed = 0f;
+                }
+                break;
+            //if we're chasing the player
+            case EnemyBehavior.Chase:
                 if (_controller.isGrounded)
                 {
                     normalizedHorizontalSpeed = (transform.position.x <= target.position.x) ? 1 : -1;
                 }
-                //if we're in the air, don't move horizontally
-                else
-                {
-                    normalizedHorizontalSpeed = 0f;
-                }
-                playerSpotted = true;
-            }
-            //if we can't see the player, don't move horizontally
-            else
-            {
-                normalizedHorizontalSpeed = 0;
-            }
-        }
-        //if the player's out of our sight range, don't move horizontally
-        else
-        {
-            //we only want to move towards home if we're on the same plane as it
-            if (Mathf.Abs(home.x - transform.position.x) > homeRadius)
-            {
+                break;
+            case EnemyBehavior.Return:
+                //if the enemy isn't where it started, return home
                 normalizedHorizontalSpeed = (home.x > transform.position.x) ? 1 : -1;
-            }
-            else
-            {
-                normalizedHorizontalSpeed = 0;
-            }
+                break;
+            case EnemyBehavior.Wander:
+                normalizedHorizontalSpeed = (facingRight) ? 1 : -1;
+                //note: I think this might break if the enemy can't move, but I might be wrong
+                if (wallDetector.inWall || wallDetector.inHazard || ! groundDetector.inGround)
+                {
+                    if (waitTimer <= 0)
+                    {
+                        waitTimer = Random.Range(waitTime.x, waitTime.y);
+                    }
+                }
+                else if (waitTimer > 0)
+                {
+                    waitTimer = 0;
+                }
+                break;
         }
+
         int isRunning = Animator.StringToHash("IsRunning");
         if (normalizedHorizontalSpeed == 0 || stunned)
         {
             enemyAnimator.SetBool(isRunning, false);
         }
-        else
+        else if (_controller.isGrounded)
         {
             enemyAnimator.SetBool(isRunning, true);
         }
@@ -167,13 +196,17 @@ public class EnemyMovement : MonoBehaviour
         if (!stunned)
         {
             float speed = (playerSpotted) ? moveSpeed : passiveSpeed;
-            if (groundDetector.inGround)
+            if (_controller.isGrounded && groundDetector.inGround && !(wallDetector.inWall || wallDetector.inHazard) )
             {
                 _velocity.x = Mathf.Lerp(_velocity.x, speed * normalizedHorizontalSpeed, Time.deltaTime * groundDamping);
             }
             else
             {
-                _velocity.x = 0;
+                if (_controller.isGrounded)
+                {
+                    _velocity.x = 0;
+                }
+                enemyAnimator.SetBool(isRunning, false);
             }
         }
         _velocity.y += player.gravity * Time.deltaTime;
@@ -181,17 +214,85 @@ public class EnemyMovement : MonoBehaviour
 
         _controller.move(_velocity * Time.deltaTime);
         _velocity = _controller.velocity;
+
+        inWallLastFrame = wallDetector.inWall;
+        inHazardLastFrame = wallDetector.inHazard;
+        inGroundLastFrame = groundDetector.inGround;
     }
+
+    /// <summary>
+    /// looks for the player based on the direction the enemy is facing
+    /// enemy has some peripheral vison so if a player gets too close
+    /// the enemy will notice them regardless of how the enemy is facing
+    /// 
+    /// ideally, their awareness would slowly fill up if the player was too close
+    /// but I only have so much time for this
+    /// </summary>
+    void LookForPlayer()
+    {
+        playerSpotted = false;
+        if (Vector3.Distance(transform.position, target.position) < sightRange)
+        {
+            //if the player is in the enemy's peripheral vision, or if the player is in line of sight
+            if (Vector3.Distance(transform.position,target.position) < peripheralVision ||
+                (facingRight && target.position.x >= transform.position.x) || (!facingRight && target.position.x < transform.position.x))
+            {
+                RaycastHit2D raycastHit;
+                raycastHit = Physics2D.Raycast(transform.position, target.position - transform.position, sightRange, sightMask);
+                Debug.DrawRay(transform.position, target.position - transform.position);
+                if (raycastHit)
+                {
+                    if (raycastHit.collider.CompareTag("Player"))
+                    {
+                        currentBehavior = EnemyBehavior.Chase;
+                        playerSpotted = true;
+                    }
+                }
+            }
+        }
+        if (!playerSpotted)
+        {
+            if (Mathf.Abs(home.y - transform.position.y) < homeRadius)
+            {
+                if (Mathf.Abs(home.x - transform.position.x) > homeRadius)
+                {
+                    currentBehavior = EnemyBehavior.Return;
+                }
+                else
+                {
+                    currentBehavior = EnemyBehavior.Idle;
+                }
+            }
+            else if (_controller.isGrounded)
+            {
+                currentBehavior = EnemyBehavior.Wander;
+            }
+            else
+            {
+                currentBehavior = EnemyBehavior.Idle;
+            }
+        }
+    }
+
+    
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(229f / 255f, 149f / 255f, 69f / 255f);
         Gizmos.DrawWireSphere(transform.position, sightRange);
+        Gizmos.color = new Color(140 / 255f, 63 / 255f, 70 / 255f);
+        Gizmos.DrawWireSphere(transform.position, peripheralVision);
     }
 
     public void TakeKnockback(Vector3 knockback)
     {
         _velocity = knockback * knockbackMultiplier;
         stunTimer = stunTime;
+        //turn to face the player if necessary
+        if ((target.position.x < transform.position.x && facingRight )
+            || (target.position.x > transform.position.x && !facingRight))
+        {
+            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        }
     }
 }

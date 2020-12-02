@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Prime31;
 using UnityEngine;
-using Prime31;
 
-public class DetectGround : MonoBehaviour
+public class DetectWalls : MonoBehaviour
 {
     [SerializeField] CharacterController2D _controller;
-    public bool inGround { get; private set; } = false;
+    public bool inWall { get; private set; } = false;
+    public bool inHazard { get; private set; } = false;
     private void Awake()
     {
         if (_controller == null)
@@ -18,20 +17,17 @@ public class DetectGround : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
         //if the layer is in our platform mask
-        if ((_controller.platformMask & 1 << collision.gameObject.layer ) != 0)
+        if ((_controller.platformMask & 1 << collision.gameObject.layer) != 0)
         {
-            if (!inGround)
+            if (!inWall)
             {
-                inGround = true;
+                inWall = true;
             }
         }
-        //else if the object is a one-way platform
-        else if (collision.gameObject.layer == 17)
+        //else if the object is a hazard
+        else if (collision.gameObject.layer == 9)
         {
-            if (!inGround)
-            {
-                inGround = true;
-            }
+            inHazard = true;
         }
     }
 
@@ -40,9 +36,16 @@ public class DetectGround : MonoBehaviour
         //if the layer is in our platform mask
         if ((_controller.platformMask & 1 << collision.gameObject.layer) != 0)
         {
-            if (inGround)
+            if (inWall)
             {
-                inGround = false;
+                inWall = false;
+            }
+        }
+        if (collision.gameObject.layer == 9)
+        {
+            if (inHazard)
+            {
+                inHazard = false;
             }
         }
     }

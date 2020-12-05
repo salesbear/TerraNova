@@ -63,6 +63,10 @@ public class DropManager : MonoBehaviour
             //if we're full on both, randomly select one of them
             else
             {
+                if (player.maxMana <= 0)
+                {
+                    return healthPickup;
+                }
                 if (Random.Range(0,100) < 50)
                 {
                     return healthPickup;

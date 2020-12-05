@@ -12,8 +12,10 @@ public class EnemyMovement : MonoBehaviour
     CharacterController2D _controller;
     Transform target;
     PlayerMovement player;
-    
+
     [Header("Player Detection")]
+    [Tooltip("Where the enemy detects from")]
+    [SerializeField] Transform eyes;
     [Tooltip("How far the enemy can see")]
     [SerializeField] float sightRange = 10f;
     [SerializeField] float peripheralVision = 3f;
@@ -26,6 +28,8 @@ public class EnemyMovement : MonoBehaviour
     [Tooltip("If the enemy is this close to its home it stops moving")]
     [SerializeField] float homeRadius = 1f;
     [SerializeField] float groundDamping = 5f;
+    [Tooltip("How fast the enemy stops if it comes across a ledge, hazard, wall, etc. higher = quicker")]
+    [SerializeField] float stopDamping = 6f;
     [Tooltip("How fast the enemy can fall")]
     [Range(1,100)]
     [SerializeField] float maxFallSpeed = 20f;
@@ -40,10 +44,11 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] float stunTime = 0.1f;
     [Tooltip("How much to multiply knockback by, higher = more knockback")]
     [SerializeField] Vector2 knockbackMultiplier = new Vector2(1,1);
+    [SerializeField] bool runOffLedge = false;
 
     [Header("Misc.")]
     [SerializeField] Animator enemyAnimator;
-    public EnemyBehavior Startbehavior;
+    public EnemyBehavior startBehavior;
 
     [Header("Debug")]
     [ReadOnly]
@@ -65,16 +70,11 @@ public class EnemyMovement : MonoBehaviour
     [ReadOnly]
     [SerializeField]
     EnemyBehavior currentBehavior;
+    [ReadOnly]
+    [SerializeField]
+    [Tooltip("true if the enemy starts facing right, false otherwise")]
+    bool startRight;
     private bool facingRight { get { return transform.localScale.x > 0f; } }
-    [ReadOnly]
-    [SerializeField]
-    bool inGroundLastFrame = true;
-    [ReadOnly]
-    [SerializeField]
-    bool inWallLastFrame = false;
-    [ReadOnly]
-    [SerializeField]
-    bool inHazardLastFrame = false;
 
     private void Awake()
     {
@@ -98,6 +98,8 @@ public class EnemyMovement : MonoBehaviour
     void Start()
     {
         home = transform.position;
+        startRight = facingRight;
+        currentBehavior = startBehavior;
     }
 
     //private void OnEnable()
@@ -196,16 +198,40 @@ public class EnemyMovement : MonoBehaviour
         if (!stunned)
         {
             float speed = (playerSpotted) ? moveSpeed : passiveSpeed;
-            if (_controller.isGrounded && groundDetector.inGround && !(wallDetector.inWall || wallDetector.inHazard) )
+            if (_controller.isGrounded)
             {
-                _velocity.x = Mathf.Lerp(_velocity.x, speed * normalizedHorizontalSpeed, Time.deltaTime * groundDamping);
+                if (runOffLedge || currentBehavior == EnemyBehavior.Chase)
+                {
+                    if (!wallDetector.inWall || playerSpotted)
+                    {
+                        if (!wallDetector.inHazard)
+                        {
+                            _velocity.x = Mathf.Lerp(_velocity.x, speed * normalizedHorizontalSpeed, Time.deltaTime * groundDamping);
+                        }
+                        else
+                        {
+                            _velocity.x = Mathf.Lerp(_velocity.x, 0, Time.deltaTime * stopDamping);
+                            enemyAnimator.SetBool(isRunning, false);
+                        }
+                    }
+                    else
+                    {
+                        _velocity.x = Mathf.Lerp(_velocity.x, 0, Time.deltaTime * stopDamping);
+                        enemyAnimator.SetBool(isRunning, false);
+                    }
+                }
+                else if (groundDetector.inGround && !(wallDetector.inWall || wallDetector.inHazard))
+                {
+                    _velocity.x = Mathf.Lerp(_velocity.x, speed * normalizedHorizontalSpeed, Time.deltaTime * groundDamping);
+                }
+                else
+                {
+                    _velocity.x = Mathf.Lerp(_velocity.x, 0, Time.deltaTime * stopDamping);
+                    enemyAnimator.SetBool(isRunning, false);
+                }
             }
             else
             {
-                if (_controller.isGrounded)
-                {
-                    _velocity.x = 0;
-                }
                 enemyAnimator.SetBool(isRunning, false);
             }
         }
@@ -214,10 +240,6 @@ public class EnemyMovement : MonoBehaviour
 
         _controller.move(_velocity * Time.deltaTime);
         _velocity = _controller.velocity;
-
-        inWallLastFrame = wallDetector.inWall;
-        inHazardLastFrame = wallDetector.inHazard;
-        inGroundLastFrame = groundDetector.inGround;
     }
 
     /// <summary>
@@ -231,15 +253,17 @@ public class EnemyMovement : MonoBehaviour
     void LookForPlayer()
     {
         playerSpotted = false;
-        if (Vector3.Distance(transform.position, target.position) < sightRange)
+        if (Vector3.Distance(eyes.position, target.position) < sightRange)
         {
             //if the player is in the enemy's peripheral vision, or if the player is in line of sight
-            if (Vector3.Distance(transform.position,target.position) < peripheralVision ||
-                (facingRight && target.position.x >= transform.position.x) || (!facingRight && target.position.x < transform.position.x))
+            if (Vector3.Distance(eyes.position,target.position) < peripheralVision 
+                || (facingRight && target.position.x >= eyes.position.x) 
+                || (!facingRight && target.position.x < eyes.position.x)
+                || currentBehavior == EnemyBehavior.Chase)
             {
                 RaycastHit2D raycastHit;
-                raycastHit = Physics2D.Raycast(transform.position, target.position - transform.position, sightRange, sightMask);
-                Debug.DrawRay(transform.position, target.position - transform.position);
+                raycastHit = Physics2D.Raycast(eyes.position, target.position - eyes.position, sightRange, sightMask);
+                Debug.DrawRay(eyes.position, target.position - eyes.position);
                 if (raycastHit)
                 {
                     if (raycastHit.collider.CompareTag("Player"))
@@ -252,21 +276,40 @@ public class EnemyMovement : MonoBehaviour
         }
         if (!playerSpotted)
         {
-            if (Mathf.Abs(home.y - transform.position.y) < homeRadius)
+            //if we're on the ground, figure out what to do based on what the enemy did originally
+            if (_controller.isGrounded)
             {
-                if (Mathf.Abs(home.x - transform.position.x) > homeRadius)
+                //if this is a stationary enemy
+                if (startBehavior == EnemyBehavior.Idle)
                 {
-                    currentBehavior = EnemyBehavior.Return;
+                    //if we can still return home, do that
+                    if (Mathf.Abs(home.y - transform.position.y) < homeRadius)
+                    {
+                        if (Mathf.Abs(home.x - transform.position.x) > homeRadius)
+                        {
+                            currentBehavior = EnemyBehavior.Return;
+                        }
+                        else
+                        {
+                            currentBehavior = EnemyBehavior.Idle;
+                            //return the enemy to the facing it started with when it returns home
+                            if (startRight != facingRight)
+                            {
+                                transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        currentBehavior = EnemyBehavior.Wander;
+                    }
                 }
                 else
                 {
-                    currentBehavior = EnemyBehavior.Idle;
+                    currentBehavior = EnemyBehavior.Wander;
                 }
             }
-            else if (_controller.isGrounded)
-            {
-                currentBehavior = EnemyBehavior.Wander;
-            }
+            //if we're not on the ground, set the enemy to idle so they don't turn in the air or anything like that
             else
             {
                 currentBehavior = EnemyBehavior.Idle;
@@ -279,9 +322,9 @@ public class EnemyMovement : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(229f / 255f, 149f / 255f, 69f / 255f);
-        Gizmos.DrawWireSphere(transform.position, sightRange);
+        Gizmos.DrawWireSphere(eyes.position, sightRange);
         Gizmos.color = new Color(140 / 255f, 63 / 255f, 70 / 255f);
-        Gizmos.DrawWireSphere(transform.position, peripheralVision);
+        Gizmos.DrawWireSphere(eyes.position, peripheralVision);
     }
 
     public void TakeKnockback(Vector3 knockback)

@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259a75bf19d4ca24f94080c214b65d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 0, y: 0, z: 0}
+  knockback: {x: 6, y: 10, z: 0}
   damage: 2
   usePlayerFacing: 1
 --- !u!1 &3273063542259548184
@@ -885,6 +885,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259a75bf19d4ca24f94080c214b65d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 0, y: 0, z: 0}
+  knockback: {x: 4, y: 3, z: 0}
   damage: 1
   usePlayerFacing: 1

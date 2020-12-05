@@ -105,7 +105,7 @@ MonoBehaviour:
   transform: {fileID: 0}
   cameraOffset: {x: -2, y: -2, z: 10}
   fallOffset: {x: -2, y: 0, z: 10}
-  lockedToBounds: 1
+  lockedToBounds: 0
   cameraBounds:
     m_Center: {x: -2.5, y: 18, z: 0}
     m_Extent: {x: 14.5, y: 23, z: 0}

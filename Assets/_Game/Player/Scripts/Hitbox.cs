@@ -23,7 +23,7 @@ public class Hitbox : MonoBehaviour
     {
         //Debug.Log("Object Detected from Hitbox");
         //if it's an enemy
-        if (collision.gameObject.layer == 11 && !hit_enemy)
+        if (collision.gameObject.layer == 11 && !hit_enemy && collision.CompareTag("Enemy"))
         {
             //Debug.Log("Enemy Hit: " + collision.gameObject.name);
             hit_enemy = true;

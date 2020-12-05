@@ -17,7 +17,7 @@ public class RevealFakeWallsTrigger : MonoBehaviour
     {
         if (wallTilemap != null)
         {
-            initialColor = Color.white;
+            initialColor = wallTilemap.color;
             invisColor = new Color(initialColor.r, initialColor.g, initialColor.b, 0);
         }
         if (startInvisible)

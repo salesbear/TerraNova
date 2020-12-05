@@ -304,7 +304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4ac240cc59408f4caf84bc90595278c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 3
+  hp: 4
   sprite: {fileID: 6670512993460982834}
   damageColor: {r: 1, g: 0.23113209, b: 0.23113209, a: 1}
   invincibilityTime: 0.15
@@ -322,9 +322,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 044eabcd04df3d342927e7fea26e6813, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
   eyes: {fileID: 4870210409364615481}
   sightRange: 15
-  peripheralVision: 2
+  peripheralVision: 3
   sightMask:
     serializedVersion: 2
     m_Bits: 398593
@@ -336,7 +337,7 @@ MonoBehaviour:
   maxFallSpeed: 20
   groundDetector: {fileID: 7825005977384969410}
   wallDetector: {fileID: 2854577784749473444}
-  waitTime: {x: 1.5, y: 2.5}
+  waitTime: {x: 0.8, y: 1.5}
   stunTime: 0.1
   knockbackMultiplier: {x: 1, y: 1}
   runOffLedge: 0
@@ -482,13 +483,13 @@ MonoBehaviour:
   _skinWidth: 0.02
   platformMask:
     serializedVersion: 2
-    m_Bits: 266497
+    m_Bits: 397569
   triggerMask:
     serializedVersion: 2
-    m_Bits: 272129
+    m_Bits: 403201
   oneWayPlatformMask:
     serializedVersion: 2
-    m_Bits: 131072
+    m_Bits: 0
   slopeLimit: 30
   jumpingThreshold: 0.07
   slopeSpeedMultiplier:

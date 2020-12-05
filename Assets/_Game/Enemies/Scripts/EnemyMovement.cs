@@ -10,7 +10,7 @@ public class EnemyMovement : MonoBehaviour
     public enum EnemyBehavior { Idle = 0,Chase,Return, Wander }
 
     CharacterController2D _controller;
-    Transform target;
+    [SerializeField] Transform target;
     PlayerMovement player;
 
     [Header("Player Detection")]
@@ -188,12 +188,8 @@ public class EnemyMovement : MonoBehaviour
         {
             enemyAnimator.SetBool(isRunning, true);
         }
-        //handle facing
-        if ((facingRight && normalizedHorizontalSpeed < 0)
-                        || (!facingRight && normalizedHorizontalSpeed > 0))
-        {
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-        }
+
+        HandleFacing();
 
         if (!stunned)
         {
@@ -266,7 +262,7 @@ public class EnemyMovement : MonoBehaviour
                 Debug.DrawRay(eyes.position, target.position - eyes.position);
                 if (raycastHit)
                 {
-                    if (raycastHit.collider.CompareTag("Player"))
+                    if (raycastHit.collider.gameObject.layer == 10)
                     {
                         currentBehavior = EnemyBehavior.Chase;
                         playerSpotted = true;
@@ -331,11 +327,26 @@ public class EnemyMovement : MonoBehaviour
     {
         _velocity = knockback * knockbackMultiplier;
         stunTimer = stunTime;
-        //turn to face the player if necessary
-        if ((target.position.x < transform.position.x && facingRight )
-            || (target.position.x > transform.position.x && !facingRight))
+        //alert the enemy
+        if (currentBehavior != EnemyBehavior.Chase)
         {
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            currentBehavior = EnemyBehavior.Chase;
+        }
+    }
+
+    /// <summary>
+    /// since the enemy can only move while on the ground,
+    /// we only want to change facing if they're on the ground
+    /// </summary>
+    void HandleFacing()
+    {
+        if (_controller.isGrounded && !stunned)
+        {
+            if ((facingRight && normalizedHorizontalSpeed < 0)
+                        || (!facingRight && normalizedHorizontalSpeed > 0))
+            {
+                transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            }
         }
     }
 }

@@ -38,7 +38,8 @@ public class DetectGround : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         //if the layer is in our platform mask
-        if ((_controller.platformMask & 1 << collision.gameObject.layer) != 0)
+        if ((_controller.platformMask & 1 << collision.gameObject.layer) != 0
+            || collision.gameObject.layer == 17)
         {
             if (inGround)
             {

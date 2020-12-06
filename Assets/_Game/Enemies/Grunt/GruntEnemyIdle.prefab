@@ -328,7 +328,7 @@ MonoBehaviour:
   peripheralVision: 3
   sightMask:
     serializedVersion: 2
-    m_Bits: 398593
+    m_Bits: 399105
   moveSpeed: 6
   passiveSpeed: 4
   homeRadius: 1

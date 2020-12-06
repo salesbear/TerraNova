@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259a75bf19d4ca24f94080c214b65d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 6, y: 10, z: 0}
+  knockback: {x: 8, y: 10, z: 0}
   damage: 2
   usePlayerFacing: 1
 --- !u!1 &3273063542259548184
@@ -557,6 +557,7 @@ MonoBehaviour:
   hurtSound: {fileID: 8300000, guid: f2e7ef3d80b6f914881638d0b82c4fbb, type: 3}
   deathSound: {fileID: 8300000, guid: eec8846c55ed79346861d1d73fd53be0, type: 3}
   heartPieceSound: {fileID: 8300000, guid: 0deb39adc49c49e4abde543f32d756bd, type: 3}
+  firePickupSound: {fileID: 8300000, guid: 09f5c843564c2f74ab4cbc439360cace, type: 3}
   pitchRange: {x: -0.1, y: 0.1}
   debugMode: 0
   heartPiecesHeld: 0
@@ -885,6 +886,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259a75bf19d4ca24f94080c214b65d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 4, y: 3, z: 0}
+  knockback: {x: 5, y: 4, z: 0}
   damage: 1
   usePlayerFacing: 1

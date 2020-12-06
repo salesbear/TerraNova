@@ -78,7 +78,7 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
-    //TODO: implement death animation, drop system
+    //TODO: implement death animation
     void Die()
     {
         GameObject drop = DropManager.instance.Drop(dropChance);

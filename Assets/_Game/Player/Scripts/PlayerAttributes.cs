@@ -33,6 +33,8 @@ public class PlayerAttributes : MonoBehaviour
     [SerializeField] private AudioClip deathSound;
     [Tooltip("The sound that plays when the player picks up a heart piece")]
     [SerializeField] private AudioClip heartPieceSound;
+    [Tooltip("The sound that plays when the player unlocks the fire ability")]
+    [SerializeField] private AudioClip firePickupSound;
     [Tooltip("the range for randomizing the pitch")]
     [SerializeField] private Vector2 pitchRange = new Vector2(-0.1f,0.1f);
     
@@ -212,5 +214,16 @@ public class PlayerAttributes : MonoBehaviour
             IncreaseMaxHealth();
             heartPiecesHeld = 0;
         }
+        else
+        {
+            health = maxHealth;
+        }
+    }
+
+    public void UnlockFire()
+    {
+        AudioManager.instance.PlaySound(firePickupSound,1,false);
+        fireUnlocked = true;
+        SetMaxMana(8);
     }
 }

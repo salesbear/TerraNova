@@ -43,7 +43,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.27536488, g: 0.3175453, b: 0.49056602, a: 0}
+  m_BackGroundColor: {r: 0.49803925, g: 0.34901962, b: 0.45098042, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -60,7 +60,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -97,9 +97,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  smoothDampTime: 0.2
+  smoothDampTime: 0.3
+  smoothDampTimeAim: 0.35
+  smoothDampTimeBoundsTransition: 0.6
+  transitionTime: 0.6
   smoothDampTimeWallslide: 0.5
   transform: {fileID: 0}
-  cameraOffset: {x: -3, y: -2, z: 10}
+  cameraOffset: {x: -2, y: -2, z: 10}
+  fallOffset: {x: -2, y: 0, z: 10}
+  lockedToBounds: 0
+  cameraBounds:
+    m_Center: {x: -2.5, y: 18, z: 0}
+    m_Extent: {x: 14.5, y: 23, z: 0}
   cameraOffsetWallslide: {x: 3, y: 2, z: 10}
   useFixedUpdate: 0

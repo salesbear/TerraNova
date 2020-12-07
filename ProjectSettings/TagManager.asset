@@ -24,9 +24,9 @@ TagManager:
   - Fireball
   - Switches
   - Pickups
-  - 
-  - 
-  - 
+  - CameraVolumes
+  - OneWayPlatform
+  - BreakableWall
   - 
   - 
   - 

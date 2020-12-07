@@ -41,7 +41,16 @@ public class PlayerFire : MonoBehaviour
         playerMove = GetComponentInParent<PlayerMovement>();
         player = GetComponentInParent<PlayerAttributes>();
         cameraScript = FindObjectOfType<SmoothFollow>();
+    }
+
+    private void OnEnable()
+    {
         PlayerStateController.StateChanged += OnStateChange;
+    }
+
+    private void OnDisable()
+    {
+        PlayerStateController.StateChanged -= OnStateChange;
     }
 
     private void Start()
@@ -51,14 +60,17 @@ public class PlayerFire : MonoBehaviour
 
     void OnStateChange(PlayerState state)
     {
-        if (state == PlayerState.Aim)
+        if (aimSprite != null)
         {
-            aimSprite.enabled = true;
-        }
-        else
-        {
-            aimSprite.enabled = false;
-            transform.rotation = Quaternion.identity;
+            if (state == PlayerState.Aim)
+            {
+                aimSprite.enabled = true;
+            }
+            else
+            {
+                aimSprite.enabled = false;
+                transform.rotation = Quaternion.identity;
+            }
         }
     }
 
@@ -101,7 +113,7 @@ public class PlayerFire : MonoBehaviour
     void StartAiming()
     {
         facingRightInitially = playerMove.facingRight;
-        Debug.Log("StartAiming");
+        //Debug.Log("StartAiming");
         _stateController.ChangeState(PlayerState.Aim);
     }
 
@@ -129,18 +141,17 @@ public class PlayerFire : MonoBehaviour
         }
 
         int facingMultiplier = (playerMove.facingRight) ? 1 : -1;
-        int offsetMultiplier = (facingRightInitially == playerMove.facingRight) ? 1 : -1;
         //set angle
         if (downPressed)
         {
             newAngle = (upPressed) ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 0, -45 * facingMultiplier);
             if (upPressed)
             {
-                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x) * offsetMultiplier, initialOffset.y, initialOffset.z);
+                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x), initialOffset.y, initialOffset.z);
             }
             else
             {
-                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x) * offsetMultiplier, initialOffset.y + offsetScale.y, initialOffset.z);
+                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x), initialOffset.y + offsetScale.y, initialOffset.z);
             }
         }
         else if (upPressed)
@@ -148,17 +159,17 @@ public class PlayerFire : MonoBehaviour
             newAngle = (diagonal) ? Quaternion.Euler(0, 0, 45 * facingMultiplier) : Quaternion.Euler(0, 0, 90 * facingMultiplier);
             if (diagonal)
             {
-                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x) * offsetMultiplier, initialOffset.y - offsetScale.y, initialOffset.z);
+                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x), initialOffset.y - offsetScale.y, initialOffset.z);
             }
             else
             {
-                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x) * offsetMultiplier, initialOffset.y - offsetScale.y, initialOffset.z);
+                cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x), initialOffset.y - offsetScale.y, initialOffset.z);
             }
         }
         else
         {
             newAngle = Quaternion.Euler(0, 0, 0);
-            cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x) * offsetMultiplier, initialOffset.y, initialOffset.z);
+            cameraScript.cameraOffset = new Vector3((initialOffset.x - offsetScale.x), initialOffset.y, initialOffset.z);
         }
 
         transform.rotation = newAngle;

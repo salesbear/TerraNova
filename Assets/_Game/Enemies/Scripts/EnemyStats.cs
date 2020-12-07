@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
 {
-    
-    [SerializeField] int hp = 3;
+    [SerializeField] int maxHp = 4;
+    [ReadOnly]
+    [SerializeField] int hp = 4;
     //the max amount of damage they've taken this frame. Needed for when the player overlaps the enemy with multiple hitboxes
     int damageTaken;
     //used to pass knockback to the TakeDamage function
@@ -21,23 +22,37 @@ public class EnemyStats : MonoBehaviour
     [Tooltip("The percent chance that the enemy drops something on death")]
     [Range(0,100)]
     [SerializeField] int dropChance = 30;
-    AudioSource audioSource;
     float invincibilityTimer = 0f;
+    [SerializeField]
+    EnemyMovement enemy;
+    [SerializeField]
+    EnemySpawner enemySpawner;
 
     bool invincible { get { return invincibilityTimer > 0; } }
+    
 
     private void Awake()
     {
+        initialColor = sprite.color;
         if (sprite == null)
         {
             sprite = GetComponent<SpriteRenderer>();
         }
-        audioSource = GetComponent<AudioSource>();
+        if (enemy == null)
+        {
+            enemy = GetComponent<EnemyMovement>();
+        }
+        if (enemySpawner == null)
+        {
+            enemySpawner = GetComponentInParent<EnemySpawner>();
+        }
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        initialColor = sprite.color;
+        sprite.color = initialColor;
+        hp = maxHp;
+        invincibilityTimer = 0;
     }
 
     private void Update()
@@ -60,13 +75,16 @@ public class EnemyStats : MonoBehaviour
 
     void TakeDamage(int amount, Vector3 knockbackVector)
     {
-        //TODO: implement enemy knockback, display enemy damage
         if (!invincible)
         {
             hp -= amount;
             sprite.color = damageColor;
             invincibilityTimer = invincibilityTime;
-            AudioSource.PlayClipAtPoint(hurtClip, transform.position);
+            AudioManager.instance.PlaySound(hurtClip, 0.8f);
+            if (enemy != null)
+            {
+                enemy.TakeKnockback(knockbackVector);
+            }
         }
 
         if (hp <= 0)
@@ -75,7 +93,7 @@ public class EnemyStats : MonoBehaviour
         }
     }
 
-    //TODO: implement death animation, drop system
+    //TODO: implement death animation
     void Die()
     {
         GameObject drop = DropManager.instance.Drop(dropChance);
@@ -84,11 +102,11 @@ public class EnemyStats : MonoBehaviour
         {
             Instantiate(drop, transform.position, transform.rotation);
         }
-        gameObject.SetActive(false);
+        enemySpawner.Despawn();
     }
 
     /// <summary>
-    /// log the amount of damage that the enemy takes, they take less damage if the player doesn't hit them
+    /// log the amount of damage that the enemy takes, they take less damage if the player doesn't hit them with the sweet spot
     /// </summary>
     /// <param name="amount"></param>
     /// <param name="knockbackVector"></param>
@@ -97,11 +115,12 @@ public class EnemyStats : MonoBehaviour
         if (damageTaken == 0)
         {
             damageTaken = amount;
+            knockbackTaken = knockbackVector;
         }
-        else
+        else if (amount < damageTaken)
         {
-            damageTaken = Mathf.Min(damageTaken, amount);
+            damageTaken = amount;
+            knockbackTaken = knockbackVector;
         }
-        knockbackTaken = knockbackVector;
     }
 }

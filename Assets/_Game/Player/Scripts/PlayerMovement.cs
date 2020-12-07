@@ -10,19 +10,21 @@ public class PlayerMovement : MonoBehaviour
 {
     
     [Header("Vertical Movement")]
-    [Range(-50,-1)]   [SerializeField] float gravity = -25f;
+    [Range(-70,-1)] public float gravity = -25f;
     [Tooltip("the fastest you can fall while sliding down a wall")]
     [Range(0, 25f)] [SerializeField] float wallSlideMaxSpeed = 5f;
-    [SerializeField] float jumpHeight = 3f;
+    [Tooltip("how far up you jump if you tab the button")]
+    [SerializeField] float jumpHeight = 4f;
+    [Tooltip("how far up you jump if you hold the button down")]
+    [SerializeField] float maxJumpHeight = 5f;
     [Tooltip("the fastest you can fall normally")]
     [SerializeField] float maxFallSpeed = 15f;
     [Tooltip("Gravity used at the peak of the jump")]
     [SerializeField] float peakGravity = -12f;
     [Tooltip("the amount of gravity applied to the player while holding the jump button")]
-    [Range(-50,-1)]
-    [SerializeField] float jumpHoldGravity = -20f;
     [SerializeField] float wallJumpHeight = 3.5f;
-    private float vel_peak = 1.5f; //this is the magnitude of vertical velocity that signifies that the character is at the peak of their jump
+    [Tooltip("the speed that signifies that the player is at the peak of their jump and should hang in the air")]
+    [SerializeField] private float speed_peak = 1.5f; //this is the magnitude of vertical velocity that signifies that the character is at the peak of their jump
     [Space]
     [Header("Dodge Stuff")]
     [SerializeField] float dodgeSpeed = 12f;
@@ -130,9 +132,16 @@ public class PlayerMovement : MonoBehaviour
         //_controller.onControllerCollidedEvent += onControllerCollider;
         //_controller.onTriggerEnterEvent += onTriggerEnterEvent;
         //_controller.onTriggerExitEvent += onTriggerExitEvent;
-        PlayerStateController.StateChanged += OnPlayerStateChanged;
     }
 
+    private void OnEnable()
+    {
+        PlayerStateController.StateChanged += OnPlayerStateChanged;
+    }
+    private void OnDisable()
+    {
+        PlayerStateController.StateChanged -= OnPlayerStateChanged;
+    }
     private void Start()
     {
         m_initialColor = m_spriteRenderer.color;
@@ -155,16 +164,20 @@ public class PlayerMovement : MonoBehaviour
     void onTriggerEnterEvent(Collider2D col)
     {
         //if the object is in the hazard or enemy layer
-        if (col.gameObject.layer == 9 || col.gameObject.layer == 11)
-        {
-            //DamageVolume temp = col.GetComponent<DamageVolume>();
-            //if (temp != null && !invincible && m_stateController.state != PlayerState.Dead)
-            //{
-            //    TakeKnockback(temp.knockbackVector);
-            //    m_player.TakeDamage(temp.damage);
-            //}
-        }
+        //if (col.gameObject.layer == 9 || col.gameObject.layer == 11)
+        //{
+        //    DamageVolume temp = col.GetComponent<DamageVolume>();
+        //    if (temp != null && !invincible && _stateController.state != PlayerState.Dead)
+        //    {
+                
+                
+        //    }
+        //}
         //Debug.Log("onTriggerEnterEvent: " + col.gameObject.name);
+        //if (col.gameObject.layer == 16)
+        //{
+        //    Debug.Log("Inside camera trigger");
+        //}
     }
 
 
@@ -187,15 +200,14 @@ public class PlayerMovement : MonoBehaviour
             {
                 coyoteTimer = coyoteTime;
             }
-            else if (_stateController.previousState == PlayerState.Dodge)
-            {
-                coyoteTimer = coyoteTimeDodge;
-            }
         }
         if (newstate == PlayerState.Dodge)
         {
-            m_playerCollision.size = dodgeSize;
-            m_playerCollision.offset = dodgeOffset;
+            if (m_playerCollision != null)
+            {
+                m_playerCollision.size = dodgeSize;
+                m_playerCollision.offset = dodgeOffset;
+            }
             _controller.recalculateDistanceBetweenRays();
         }
         else if (_stateController.previousState == PlayerState.Dodge)
@@ -203,6 +215,7 @@ public class PlayerMovement : MonoBehaviour
             m_playerCollision.offset = startOffset;
             m_playerCollision.size = startSize;
             _controller.recalculateDistanceBetweenRays();
+            dodgeCooldownTimer = dodgeCooldownTime;
         }
         //if newstate is one in which we cannot move horizontally, mark that
         if ((int)newstate >= 8)
@@ -223,14 +236,7 @@ public class PlayerMovement : MonoBehaviour
         //if we're dead, don't keep sliding on the floor
         if (_controller.isGrounded)
         {
-            if (_stateController.state == PlayerState.Dead)
-            {
-                _velocity.x = 0;
-            }
-            else
-            {
-                canJump = true;
-            }
+            canJump = (_stateController.state != PlayerState.Dead);
         }
         //update all the timers we're keeping track of
         UpdateTimers();
@@ -276,7 +282,15 @@ public class PlayerMovement : MonoBehaviour
         }
 
         HandleGravity();
-
+        if (_stateController.state == PlayerState.Dead)
+        {
+            _velocity = Vector3.zero;
+            if (m_playerCollision.enabled)
+            {
+                m_playerCollision.enabled = false;
+            }
+            m_spriteRenderer.enabled = false;
+        }
         _controller.move(_velocity * Time.deltaTime);
 
         // grab our current _velocity to use as a base for all calculations
@@ -291,6 +305,14 @@ public class PlayerMovement : MonoBehaviour
         if (coyoteTimer > 0)
         {
             coyoteTimer -= Time.deltaTime;
+        }
+        //if we're dodging and we were on the ground in our last state, set coyote time
+        if (_stateController.state == PlayerState.Dodge && 
+            ((int)_stateController.previousState <= 1 
+            || _stateController.previousState == PlayerState.Attack 
+            || _stateController.previousState == PlayerState.Aim))
+        {
+            coyoteTimer = coyoteTimeDodge;
         }
         //knockback timer
         if (knockbackTimer > 0)
@@ -334,7 +356,10 @@ public class PlayerMovement : MonoBehaviour
         if (dodgeCooldownTimer > 0)
         {
             dodgeCooldownTimer -= Time.deltaTime;
-            if (dodgeCooldownTimer <= 0)
+            //clamp dodge cooldown timer to 0 so we don't get weird stuff in the lerp
+            dodgeCooldownTimer = Mathf.Max(dodgeCooldownTimer, 0);
+            m_spriteRenderer.color = Color.Lerp(m_initialColor, dodgeCooldownTint, dodgeCooldownTimer / dodgeCooldownTime);
+            if (dodgeCooldownTimer == 0)
             {
                 m_spriteRenderer.color = m_initialColor;
             }
@@ -353,9 +378,15 @@ public class PlayerMovement : MonoBehaviour
                     {
                         _stateController.ChangeState(0);
                     }
-                    else
+                    //if we're falling, change state to falling
+                    else if (_velocity.y < 0)
                     {
                         _stateController.ChangeState(3);
+                    }
+                    //if we're moving up, change state to jumping
+                    else
+                    {
+                        _stateController.ChangeState(2);
                     }
                     dodgeCooldownTimer = dodgeCooldownTime;
                 }
@@ -542,12 +573,24 @@ public class PlayerMovement : MonoBehaviour
         //{
         //    _stateController.ChangeState(PlayerState.Jump);
         //}
-        //if they aren't grounded and we're going up slowly, slow down gravity to give the player a moment to adjust their jump
-        if (holdingJump && _velocity.y > vel_peak && _stateController.state == PlayerState.Jump)
+        //if they're holding jump and they're moving upwards faster than the speed at the peak of their jump, reduce grav so they can jump higher
+        //state change is here so that you can't mess with knockback velocities
+        if (holdingJump && _velocity.y > speed_peak && (_stateController.state == PlayerState.Jump || _stateController.state == PlayerState.Dodge))
         {
-            _velocity.y += jumpHoldGravity * Time.deltaTime;
+            float gravityMultiplier;
+            if (_stateController.previousState == PlayerState.WallSlide)
+            {
+                gravityMultiplier = wallJumpHeight / maxJumpHeight;
+            }
+            else
+            {
+                gravityMultiplier = jumpHeight / maxJumpHeight;
+            }
+            //Debug.Log("gravity multiplier: " + gravityMultiplier);
+            _velocity.y += gravity * Time.deltaTime * gravityMultiplier;
         }
-        else if (_velocity.y < vel_peak && _stateController.state == PlayerState.Jump)
+        //slow gravity near the peak of their jump to help them plan where they're going to fall
+        else if (_velocity.y < speed_peak && _stateController.state == PlayerState.Jump)
         {
             _velocity.y += peakGravity * Time.deltaTime;
         }
@@ -595,7 +638,12 @@ public class PlayerMovement : MonoBehaviour
         if (!invincible)
         {
             _player.TakeDamage(amount);
-            if (_stateController.state != PlayerState.Dead)
+            //don't take knockback if you dodge
+            if (_stateController.state == PlayerState.Dodge)
+            {
+                invTimer = invTimeDamaged;
+            }
+            else if (_stateController.state != PlayerState.Dead)
             {
                 _velocity = knockbackVel;
                 knockbackTimer = knockbackTime;

@@ -162,8 +162,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1185372965277212873}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.1852, y: -0.159, z: 0}
-  m_LocalScale: {x: 0.65592045, y: 0.5859696, z: 1}
+  m_LocalPosition: {x: 1.223, y: -0.159, z: 0}
+  m_LocalScale: {x: 0.6977866, y: 0.6811897, z: 1}
   m_Children: []
   m_Father: {fileID: 7199682652019064675}
   m_RootOrder: 1
@@ -255,8 +255,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259a75bf19d4ca24f94080c214b65d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 0, y: 0, z: 0}
+  knockback: {x: 8, y: 10, z: 0}
   damage: 2
+  usePlayerFacing: 1
 --- !u!1 &3273063542259548184
 GameObject:
   m_ObjectHideFlags: 0
@@ -277,6 +278,7 @@ GameObject:
   - component: {fileID: 282825911}
   - component: {fileID: 861965012}
   - component: {fileID: 1395305151122194669}
+  - component: {fileID: 99354938}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -339,8 +341,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 6ee485de456144e4e872ade41d5fbb2b, type: 3}
+  m_SortingOrder: 1
+  m_Sprite: {fileID: -1416604817420825889, guid: eeea260ce472d7f4287c04fd43aa4892, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -386,13 +388,13 @@ MonoBehaviour:
   _skinWidth: 0.02
   platformMask:
     serializedVersion: 2
-    m_Bits: 257
+    m_Bits: 262401
   triggerMask:
     serializedVersion: 2
-    m_Bits: 56832
+    m_Bits: 384512
   oneWayPlatformMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 131072
   slopeLimit: 50
   jumpingThreshold: 0.07
   slopeSpeedMultiplier:
@@ -443,18 +445,18 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.11217022}
+  m_Offset: {x: 0, y: -0.28047305}
   m_SpriteTilingProperty:
-    border: {x: 0.40429688, y: 0, z: 0.13671875, w: 0}
-    pivot: {x: 0.4, y: 0.5}
-    oldSize: {x: 2, y: 2}
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.48, y: 0.5}
+    oldSize: {x: 2.5, y: 2.5}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3869133, y: 1.7781408}
+  m_Size: {x: 0.38, y: 1.9389304}
   m_EdgeRadius: 0
 --- !u!50 &3273063542259548185
 Rigidbody2D:
@@ -489,34 +491,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c6aee28e39a6bf489a5f74718e87403, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravity: -25
+  gravity: -40
   wallSlideMaxSpeed: 5
-  jumpHeight: 4
+  jumpHeight: 2.1
+  maxJumpHeight: 5.5
   maxFallSpeed: 20
-  peakGravity: -12
-  jumpHoldGravity: -19
+  peakGravity: -15
   wallJumpHeight: 3.5
+  speed_peak: 1
   dodgeSpeed: 18
   dodgeTime: 0.25
-  invTimeDodge: 0.22
-  dodgeCooldownTime: 0.15
-  dodgeCooldownTint: {r: 0.70980394, g: 0.70980394, b: 0.70980394, a: 1}
-  dodgeSize: {x: 0.3869133, y: 0.75}
-  dodgeOffset: {x: 0, y: -0.625}
+  dodgeTint: {r: 0.5613208, g: 0.95299864, b: 1, a: 1}
+  invTimeDodge: 0.25
+  dodgeCooldownTime: 0.5
+  dodgeCooldownTint: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
+  dodgeSize: {x: 0.38, y: 0.75}
+  dodgeOffset: {x: 0, y: -0.875}
   runSpeed: 9
   wallJumpSpeed: 14
-  groundDamping: 10
-  inAirDamping: 4
-  invTimeDamaged: 1.25
+  groundDamping: 12
+  inAirDamping: 3.5
+  invTimeDamaged: 1.5
   knockbackTime: 0.25
   flashTime: 0.08
   coyoteTime: 0.15
-  coyoteTimeDodge: 0.15
+  coyoteTimeDodge: 0.25
   jumpSound: {fileID: 8300000, guid: ae83ff4dfc3c3574599d35d93de055f6, type: 3}
   jumpVolume: 0.85
   dodgeSound: {fileID: 8300000, guid: 3ad9b205e5ce146449c5be671cc54df2, type: 3}
   pitchRange: {x: -0.1, y: 0.1}
-  dodgeTint: {r: 0.5613208, g: 0.95299864, b: 1, a: 1}
   _velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &1723836365
 MonoBehaviour:
@@ -546,15 +549,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 6
   health: 0
-  maxMana: 6
-  fireUnlocked: 1
-  wallJumpUnlocked: 1
+  maxMana: 0
+  fireUnlocked: 0
+  wallJumpUnlocked: 0
   healSound: {fileID: 8300000, guid: 6c2440afb0162164898bfa5f7c429dba, type: 3}
   manaRegenSound: {fileID: 8300000, guid: 11543e6bf345946498a71ee881935507, type: 3}
   hurtSound: {fileID: 8300000, guid: f2e7ef3d80b6f914881638d0b82c4fbb, type: 3}
   deathSound: {fileID: 8300000, guid: eec8846c55ed79346861d1d73fd53be0, type: 3}
+  heartPieceSound: {fileID: 8300000, guid: 0deb39adc49c49e4abde543f32d756bd, type: 3}
+  firePickupSound: {fileID: 8300000, guid: 09f5c843564c2f74ab4cbc439360cace, type: 3}
   pitchRange: {x: -0.1, y: 0.1}
-  debugMode: 1
+  debugMode: 0
+  heartPiecesHeld: 0
 --- !u!114 &282825911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -683,6 +689,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e8ec1f2ceaa5374a8edd9c4b5515cec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &99354938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3273063542259548184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d4d2d73bf45214d923fa6cd58d7f09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerAnimator: {fileID: 3273063542259548178}
 --- !u!1 &4675741254686542927
 GameObject:
   m_ObjectHideFlags: 0
@@ -867,5 +886,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 259a75bf19d4ca24f94080c214b65d56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knockback: {x: 0, y: 0, z: 0}
+  knockback: {x: 5, y: 4, z: 0}
   damage: 1
+  usePlayerFacing: 1

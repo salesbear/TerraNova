@@ -74,57 +74,60 @@ public class SmoothFollow : MonoBehaviour
 
 	void updateCameraPosition()
 	{
-		if( _playerController == null )
-		{
-			transform.position = Vector3.SmoothDamp( transform.position, target.position - cameraOffset, ref _smoothDampVelocity, smoothDampTime );
-			return;
-		}
-        //set smooth damp time and camera offset based on state
-        float smoothDampTimeLocal;
-        Vector3 cameraOffsetLocal;
-        //set smooth damp time and camera offset based on our state
-        switch((int)_stateController.state)
+        if (_stateController.state != PlayerState.Dead)
         {
-            case 4:
-                cameraOffsetLocal = cameraOffsetWallslide;
-                smoothDampTimeLocal = smoothDampTimeWallslide;
-                break;
-            case 5:
-                //camera offset is changed in aim so that we can look in the same direction as we aiming
-                cameraOffsetLocal = cameraOffset;
-                smoothDampTimeLocal = smoothDampTimeAim;
-                break;
-            default:
-                cameraOffsetLocal = cameraOffset;
-                smoothDampTimeLocal = smoothDampTime;
-                break;
+            if( _playerController == null )
+		    {
+			    transform.position = Vector3.SmoothDamp( transform.position, target.position - cameraOffset, ref _smoothDampVelocity, smoothDampTime );
+			    return;
+		    }
+            //set smooth damp time and camera offset based on state
+            float smoothDampTimeLocal;
+            Vector3 cameraOffsetLocal;
+            //set smooth damp time and camera offset based on our state
+            switch((int)_stateController.state)
+            {
+                case 4:
+                    cameraOffsetLocal = cameraOffsetWallslide;
+                    smoothDampTimeLocal = smoothDampTimeWallslide;
+                    break;
+                case 5:
+                    //camera offset is changed in aim so that we can look in the same direction as we aiming
+                    cameraOffsetLocal = cameraOffset;
+                    smoothDampTimeLocal = smoothDampTimeAim;
+                    break;
+                default:
+                    cameraOffsetLocal = cameraOffset;
+                    smoothDampTimeLocal = smoothDampTime;
+                    break;
+            }
+            //if we're falling, or we're dodging and falling, set our offset so we can still see our character
+            if (_stateController.state == PlayerState.Fall || 
+                (_stateController.state == PlayerState.Dodge 
+                && ! _playerController.isGrounded
+                && _playerController.velocity.y < 0))
+            {
+                cameraOffsetLocal = fallOffset;
+            }
+            if (transitionTimer > 0)
+            {
+                transitionTimer -= Time.deltaTime;
+                smoothDampTimeLocal = smoothDampTimeBoundsTransition;
+            }
+            if ( _playerMove.facingRight )
+		    {
+                //set target offset to where we want our camera to go
+                Vector3 targetOffset = GetOffset(target.position - cameraOffsetLocal);
+                transform.position = Vector3.SmoothDamp( transform.position, targetOffset, ref _smoothDampVelocity, smoothDampTimeLocal );
+		    }
+		    else
+		    {
+			    Vector3 leftOffset = cameraOffsetLocal;
+			    leftOffset.x *= -1;
+                Vector3 targetOffset = GetOffset(target.position - leftOffset);
+                transform.position = Vector3.SmoothDamp( transform.position, targetOffset, ref _smoothDampVelocity, smoothDampTimeLocal );
+		    }
         }
-        //if we're falling, or we're dodging and falling, set our offset so we can still see our character
-        if (_stateController.state == PlayerState.Fall || 
-            (_stateController.state == PlayerState.Dodge 
-            && ! _playerController.isGrounded
-            && _playerController.velocity.y < 0))
-        {
-            cameraOffsetLocal = fallOffset;
-        }
-        if (transitionTimer > 0)
-        {
-            transitionTimer -= Time.deltaTime;
-            smoothDampTimeLocal = smoothDampTimeBoundsTransition;
-        }
-        if ( _playerMove.facingRight )
-		{
-            //set target offset to where we want our camera to go
-            Vector3 targetOffset = GetOffset(target.position - cameraOffsetLocal);
-            transform.position = Vector3.SmoothDamp( transform.position, targetOffset, ref _smoothDampVelocity, smoothDampTimeLocal );
-		}
-		else
-		{
-			Vector3 leftOffset = cameraOffsetLocal;
-			leftOffset.x *= -1;
-            Vector3 targetOffset = GetOffset(target.position - leftOffset);
-            transform.position = Vector3.SmoothDamp( transform.position, targetOffset, ref _smoothDampVelocity, smoothDampTimeLocal );
-		}
 	}
 	
     /// <summary>

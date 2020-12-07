@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class EnemyStats : MonoBehaviour
 {
-    
-    [SerializeField] int hp = 3;
+    [SerializeField] int maxHp = 4;
+    [ReadOnly]
+    [SerializeField] int hp = 4;
     //the max amount of damage they've taken this frame. Needed for when the player overlaps the enemy with multiple hitboxes
     int damageTaken;
     //used to pass knockback to the TakeDamage function
@@ -22,22 +23,36 @@ public class EnemyStats : MonoBehaviour
     [Range(0,100)]
     [SerializeField] int dropChance = 30;
     float invincibilityTimer = 0f;
+    [SerializeField]
+    EnemyMovement enemy;
+    [SerializeField]
+    EnemySpawner enemySpawner;
 
     bool invincible { get { return invincibilityTimer > 0; } }
-    EnemyMovement enemy;
+    
 
     private void Awake()
     {
+        initialColor = sprite.color;
         if (sprite == null)
         {
             sprite = GetComponent<SpriteRenderer>();
         }
-        enemy = GetComponent<EnemyMovement>();
+        if (enemy == null)
+        {
+            enemy = GetComponent<EnemyMovement>();
+        }
+        if (enemySpawner == null)
+        {
+            enemySpawner = GetComponentInParent<EnemySpawner>();
+        }
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        initialColor = sprite.color;
+        sprite.color = initialColor;
+        hp = maxHp;
+        invincibilityTimer = 0;
     }
 
     private void Update()
@@ -87,7 +102,7 @@ public class EnemyStats : MonoBehaviour
         {
             Instantiate(drop, transform.position, transform.rotation);
         }
-        gameObject.SetActive(false);
+        enemySpawner.Despawn();
     }
 
     /// <summary>

@@ -132,9 +132,16 @@ public class PlayerMovement : MonoBehaviour
         //_controller.onControllerCollidedEvent += onControllerCollider;
         //_controller.onTriggerEnterEvent += onTriggerEnterEvent;
         //_controller.onTriggerExitEvent += onTriggerExitEvent;
-        PlayerStateController.StateChanged += OnPlayerStateChanged;
     }
 
+    private void OnEnable()
+    {
+        PlayerStateController.StateChanged += OnPlayerStateChanged;
+    }
+    private void OnDisable()
+    {
+        PlayerStateController.StateChanged -= OnPlayerStateChanged;
+    }
     private void Start()
     {
         m_initialColor = m_spriteRenderer.color;
@@ -196,8 +203,11 @@ public class PlayerMovement : MonoBehaviour
         }
         if (newstate == PlayerState.Dodge)
         {
-            m_playerCollision.size = dodgeSize;
-            m_playerCollision.offset = dodgeOffset;
+            if (m_playerCollision != null)
+            {
+                m_playerCollision.size = dodgeSize;
+                m_playerCollision.offset = dodgeOffset;
+            }
             _controller.recalculateDistanceBetweenRays();
         }
         else if (_stateController.previousState == PlayerState.Dodge)
@@ -226,14 +236,7 @@ public class PlayerMovement : MonoBehaviour
         //if we're dead, don't keep sliding on the floor
         if (_controller.isGrounded)
         {
-            if (_stateController.state == PlayerState.Dead)
-            {
-                _velocity.x = 0;
-            }
-            else
-            {
-                canJump = true;
-            }
+            canJump = (_stateController.state != PlayerState.Dead);
         }
         //update all the timers we're keeping track of
         UpdateTimers();
@@ -279,7 +282,15 @@ public class PlayerMovement : MonoBehaviour
         }
 
         HandleGravity();
-
+        if (_stateController.state == PlayerState.Dead)
+        {
+            _velocity = Vector3.zero;
+            if (m_playerCollision.enabled)
+            {
+                m_playerCollision.enabled = false;
+            }
+            m_spriteRenderer.enabled = false;
+        }
         _controller.move(_velocity * Time.deltaTime);
 
         // grab our current _velocity to use as a base for all calculations

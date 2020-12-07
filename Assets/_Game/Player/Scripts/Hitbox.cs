@@ -7,7 +7,6 @@ public class Hitbox : MonoBehaviour
     [Tooltip("The knockback applied to whatever you hit. X should be positive if you're using player facing")]
     [SerializeField] Vector3 knockback;
     [SerializeField] int damage = 2; //the amount of damage you do to enemies
-    bool hit_enemy = false;
     
     PlayerMovement player;
     [Tooltip("If true, knockback direction is determined by player facing")]
@@ -23,10 +22,9 @@ public class Hitbox : MonoBehaviour
     {
         //Debug.Log("Object Detected from Hitbox");
         //if it's an enemy
-        if (collision.gameObject.layer == 11 && !hit_enemy && collision.CompareTag("Enemy"))
+        if (collision.gameObject.layer == 11 && collision.CompareTag("Enemy"))
         {
             //Debug.Log("Enemy Hit: " + collision.gameObject.name);
-            hit_enemy = true;
             EnemyStats enemy = collision.gameObject.GetComponentInParent<EnemyStats>();
             if (enemy != null)
             {
@@ -62,10 +60,5 @@ public class Hitbox : MonoBehaviour
                 breakableWall.BreakWall();
             }
         }
-    }
-
-    private void OnDisable()
-    {
-        hit_enemy = false;
     }
 }

@@ -41,7 +41,16 @@ public class PlayerFire : MonoBehaviour
         playerMove = GetComponentInParent<PlayerMovement>();
         player = GetComponentInParent<PlayerAttributes>();
         cameraScript = FindObjectOfType<SmoothFollow>();
+    }
+
+    private void OnEnable()
+    {
         PlayerStateController.StateChanged += OnStateChange;
+    }
+
+    private void OnDisable()
+    {
+        PlayerStateController.StateChanged -= OnStateChange;
     }
 
     private void Start()
@@ -51,14 +60,17 @@ public class PlayerFire : MonoBehaviour
 
     void OnStateChange(PlayerState state)
     {
-        if (state == PlayerState.Aim)
+        if (aimSprite != null)
         {
-            aimSprite.enabled = true;
-        }
-        else
-        {
-            aimSprite.enabled = false;
-            transform.rotation = Quaternion.identity;
+            if (state == PlayerState.Aim)
+            {
+                aimSprite.enabled = true;
+            }
+            else
+            {
+                aimSprite.enabled = false;
+                transform.rotation = Quaternion.identity;
+            }
         }
     }
 

@@ -7,7 +7,7 @@ using Prime31;
 [RequireComponent(typeof(CharacterController2D))]
 public class EnemyMovement : MonoBehaviour
 {
-    public enum EnemyBehavior { Idle = 0,Chase,Return, Wander }
+    public enum EnemyBehavior { Idle = 0,Chase,Return, Wander}
 
     CharacterController2D _controller;
     [SerializeField] Transform target;
@@ -80,6 +80,8 @@ public class EnemyMovement : MonoBehaviour
     {
         player = FindObjectOfType<PlayerMovement>();
         target = player.gameObject.transform;
+        startRight = facingRight;
+        home = transform.position;
         _controller = GetComponent<CharacterController2D>();
         if (enemyAnimator == null)
         {
@@ -94,22 +96,15 @@ public class EnemyMovement : MonoBehaviour
             wallDetector = GetComponentInChildren<DetectWalls>();
         }
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        home = transform.position;
-        startRight = facingRight;
-        currentBehavior = startBehavior;
-    }
 
-    //private void OnEnable()
-    //{
-    //    _controller.onControllerCollidedEvent += onControllerCollider;
-    //}
-    //private void OnDisable()
-    //{
-    //    _controller.onControllerCollidedEvent -= onControllerCollider;
-    //}
+    private void OnEnable()
+    {
+        Spawn();
+    }
+    private void OnDisable()
+    {
+        _velocity = Vector3.zero;
+    }
 
     //void onControllerCollider(RaycastHit2D hit)
     //{
@@ -124,6 +119,7 @@ public class EnemyMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (stunned)
         {
             stunTimer -= Time.deltaTime;
@@ -348,5 +344,11 @@ public class EnemyMovement : MonoBehaviour
                 transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
             }
         }
+    }
+
+    void Spawn()
+    {
+        transform.position = home;
+        currentBehavior = startBehavior;
     }
 }
